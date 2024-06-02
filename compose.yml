@@ -1,0 +1,14 @@
+---
+services:
+  rabbitmq:
+    image: rabbitmq:3.12.14-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  client:
+    image: ubuntu:latest
+    environment:
+      TZ: UTC
+    tty: true
+    command: /bin/bash

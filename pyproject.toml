@@ -1,0 +1,74 @@
+[project]
+name = "websockets-notification-py"
+version = "0.0.1"
+dependencies = [
+    "websockets",
+    "aio-pika",
+    "pydantic",
+    "pydantic-settings",
+    
+    "httpx",
+    "pyjwt[crypto]",
+
+    "sentry-sdk",
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "ipython",
+
+    "pytest-deadfixtures",
+    "pytest-mock",
+    "pytest-randomly",
+    "pytest-freezegun",
+    "pytest-asyncio",
+    "respx",
+
+    "dotenv-linter",
+    "mypy",
+]
+
+
+[tool.ruff]
+line-length = 160
+target-version = "py312"
+
+
+[tool.roof.lint]
+select = ["ALL"]
+
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src"]
+python_files = ["test*.py"]
+filterwarnings = [
+    "ignore:distutils Version classes are deprecated. Use packaging.version instead.:DeprecationWarning:pytest_freezegun:17",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "rabbitmq: marks test as required rabbitmq conneciton",
+]
+asyncio_mode = "auto"
+
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "src"
+files = "src"
+namespace_packages = true
+explicit_package_bases = true
+warn_no_return = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+no_implicit_reexport = true
+strict_equality = true
+warn_unreachable = true
+disallow_untyped_calls = true
