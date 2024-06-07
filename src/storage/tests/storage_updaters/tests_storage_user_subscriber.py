@@ -6,31 +6,31 @@ from storage.types import SubscriptionFullQualifiedIdentifier
 
 
 @pytest.fixture
-def ya_ws_same_user_authenticated(ya_ws_connection, ya_valid_token, authenticate_ws):
-    authenticate_ws(ya_ws_connection, ya_valid_token)
-    return ya_ws_connection
+def same_user_ya_ws_registered(ya_ws, ya_valid_token, register_ws):
+    register_ws(ya_ws, ya_valid_token)
+    return ya_ws
 
 
 @pytest.fixture
-def ya_user_ws_authenticated(ya_ws_connection, ya_user_valid_token, authenticate_ws):
-    authenticate_ws(ya_ws_connection, ya_user_valid_token)
-    return ya_ws_connection
+def ya_user_ws_registered(ya_ws, ya_user_valid_token, register_ws):
+    register_ws(ya_ws, ya_user_valid_token)
+    return ya_ws
 
 
 @pytest.fixture
 def subscribe(storage):
-    def subscribe_user(ws, subscription_fqi):
-        return StorageUserSubscriber(
+    def subscribe(ws, subscription_fqi):
+        StorageUserSubscriber(
             storage=storage,
             websocket=ws,
             subscription_fqi=subscription_fqi,
         )()
 
-    return subscribe_user
+    return subscribe
 
 
-def test_create_subscription_in_storage_subscriptions(ws_authenticated, subscribe, storage, event, event_subscription_identifier, subscription_fqi):
-    subscribe(ws_authenticated, subscription_fqi)
+def test_create_subscription_in_storage_subscriptions(ws_registered, subscribe, storage, event, event_subscription_identifier, subscription_fqi):
+    subscribe(ws_registered, subscription_fqi)
 
     assert event in storage.subscriptions, "Event should be created in storage"
     assert event_subscription_identifier in storage.subscriptions[event], "Identifier should be created"
@@ -38,9 +38,9 @@ def test_create_subscription_in_storage_subscriptions(ws_authenticated, subscrib
     assert storage.user_connections["user1"].user_subscriptions == {subscription_fqi}, "Subscription should be added to user subscriptions"
 
 
-def test_subscription_with_same_params_idempotent(ws_authenticated, subscribe, storage, subscription_fqi, event, event_subscription_identifier):
-    subscribe(ws_authenticated, subscription_fqi)
-    subscribe(ws_authenticated, subscription_fqi)
+def test_subscription_with_same_params_idempotent(ws_registered, subscribe, storage, subscription_fqi, event, event_subscription_identifier):
+    subscribe(ws_registered, subscription_fqi)
+    subscribe(ws_registered, subscription_fqi)
 
     assert len(storage.subscriptions) == 1
     assert len(storage.subscriptions[event]) == 1
@@ -49,12 +49,12 @@ def test_subscription_with_same_params_idempotent(ws_authenticated, subscribe, s
     assert len(storage.user_connections["user1"].user_subscriptions) == 1
 
 
-def test_subscription_same_user_other_connection_idempotent(
-    ws_authenticated, ya_ws_same_user_authenticated, subscribe, storage, subscription_fqi, event, event_subscription_identifier
+def test_subscription_same_user_other_websocket_idempotent(
+    ws_registered, same_user_ya_ws_registered, subscribe, storage, subscription_fqi, event, event_subscription_identifier
 ):
-    subscribe(ws_authenticated, subscription_fqi)
+    subscribe(ws_registered, subscription_fqi)
 
-    subscribe(ya_ws_same_user_authenticated, subscription_fqi)
+    subscribe(same_user_ya_ws_registered, subscription_fqi)
 
     assert len(storage.subscriptions) == 1
     assert len(storage.subscriptions[event]) == 1
@@ -62,24 +62,24 @@ def test_subscription_same_user_other_connection_idempotent(
     assert len(storage.user_connections["user1"].user_subscriptions) == 1
 
 
-def test_subscription_to_same_event_other_identifier(ws_authenticated, subscribe, storage, event, event_subscription_key, subscription_fqi):
-    same_event_fqi = SubscriptionFullQualifiedIdentifier(event, event_subscription_key, ("userY",))
-    subscribe(ws_authenticated, subscription_fqi)
+def test_subscription_to_same_event_other_identifier(ws_registered, subscribe, storage, event, event_subscription_key, subscription_fqi):
+    same_event_ya_identifier_fqi = SubscriptionFullQualifiedIdentifier(event, event_subscription_key, ("userY",))
+    subscribe(ws_registered, subscription_fqi)
 
-    subscribe(ws_authenticated, same_event_fqi)
+    subscribe(ws_registered, same_event_ya_identifier_fqi)
 
     assert len(storage.subscriptions) == 1
     assert len(storage.subscriptions[event]) == 2
     assert storage.subscriptions[event][("userX",)] == {"user1"}
     assert storage.subscriptions[event][("userY",)] == {"user1"}
-    assert storage.user_connections["user1"].user_subscriptions == {subscription_fqi, same_event_fqi}
+    assert storage.user_connections["user1"].user_subscriptions == {subscription_fqi, same_event_ya_identifier_fqi}
 
 
-def test_subscription_two_different_events(ws_authenticated, subscribe, storage, subscription_fqi, event, event_subscription_identifier):
+def test_subscription_two_different_events(ws_registered, subscribe, storage, subscription_fqi, event, event_subscription_identifier):
     other_event_fqi = SubscriptionFullQualifiedIdentifier("classifierId", ("userId", "projectUrn"), ("user008", "some-urn"))
-    subscribe(ws_authenticated, subscription_fqi)
+    subscribe(ws_registered, subscription_fqi)
 
-    subscribe(ws_authenticated, other_event_fqi)
+    subscribe(ws_registered, other_event_fqi)
 
     assert len(storage.subscriptions) == 2
     assert storage.subscriptions[event][event_subscription_identifier] == {"user1"}
@@ -88,11 +88,11 @@ def test_subscription_two_different_events(ws_authenticated, subscribe, storage,
 
 
 def test_other_user_with_same_fqi_subscribe_ok(
-    ws_authenticated, ya_user_ws_authenticated, subscribe, storage, subscription_fqi, event, event_subscription_identifier
+    ws_registered, ya_user_ws_registered, subscribe, storage, subscription_fqi, event, event_subscription_identifier
 ):
-    subscribe(ws_authenticated, subscription_fqi)
+    subscribe(ws_registered, subscription_fqi)
 
-    subscribe(ya_user_ws_authenticated, subscription_fqi)
+    subscribe(ya_user_ws_registered, subscription_fqi)
 
     assert storage.subscriptions[event][event_subscription_identifier] == {"user1", "user2"}
     assert storage.user_connections["user1"].user_subscriptions == {subscription_fqi}
@@ -100,12 +100,12 @@ def test_other_user_with_same_fqi_subscribe_ok(
 
 
 def test_other_user_subscription_to_other_event_ok(
-    ws_authenticated, ya_user_ws_authenticated, subscribe, storage, subscription_fqi, event, event_subscription_identifier
+    ws_registered, ya_user_ws_registered, subscribe, storage, subscription_fqi, event, event_subscription_identifier
 ):
     ya_subscribe_fqi = SubscriptionFullQualifiedIdentifier("classifierId", ("entityId"), (100500,))
-    subscribe(ws_authenticated, subscription_fqi)
+    subscribe(ws_registered, subscription_fqi)
 
-    subscribe(ya_user_ws_authenticated, ya_subscribe_fqi)
+    subscribe(ya_user_ws_registered, ya_subscribe_fqi)
 
     assert len(storage.subscriptions) == 2
     assert storage.subscriptions[event][event_subscription_identifier] == {"user1"}
@@ -114,9 +114,9 @@ def test_other_user_subscription_to_other_event_ok(
     assert storage.user_connections["user2"].user_subscriptions == {ya_subscribe_fqi}
 
 
-def test_raise_if_ws_connection_not_authenticated(ws_connection, subscribe, storage, subscription_fqi):
-    with pytest.raises(StorageOperationException, match="The user is not authenticated"):
-        subscribe(ws_connection, subscription_fqi)
+def test_raise_if_ws_connection_not_registered(ws, subscribe, storage, subscription_fqi):
+    with pytest.raises(StorageOperationException, match="The user is not registered"):
+        subscribe(ws, subscription_fqi)
 
     assert storage.subscriptions == {}
     assert storage.user_connections == {}

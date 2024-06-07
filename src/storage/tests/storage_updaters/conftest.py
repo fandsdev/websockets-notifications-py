@@ -23,27 +23,27 @@ def ya_user_valid_token():
 
 
 @pytest.fixture
-def ws_connection():
+def ws():
     return MockedWebSocketServerProtocol()
 
 
 @pytest.fixture
-def ya_ws_connection():
+def ya_ws():
     return MockedWebSocketServerProtocol()
 
 
 @pytest.fixture
-def authenticate_ws(storage):
-    def authenticate(ws_connection, token):
-        StorageConnectionRegister(storage, ws_connection, token)()
+def register_ws(storage):
+    def register(ws, token):
+        StorageConnectionRegister(storage, ws, token)()
 
-    return authenticate
+    return register
 
 
 @pytest.fixture
-def ws_authenticated(ws_connection, valid_token, authenticate_ws):
-    authenticate_ws(ws_connection, valid_token)
-    return ws_connection
+def ws_registered(ws, valid_token, register_ws):
+    register_ws(ws, valid_token)
+    return ws
 
 
 @pytest.fixture
@@ -72,11 +72,17 @@ def subscription_fqi(event, event_subscription_key, event_subscription_identifie
 
 @pytest.fixture
 def subscribe_ws(storage):
-    def subscribe(ws_connection, subscription_fqi):
+    def subscribe(ws, subscription_fqi):
         StorageUserSubscriber(
             storage=storage,
-            websocket=ws_connection,
+            websocket=ws,
             subscription_fqi=subscription_fqi,
         )()
 
     return subscribe
+
+
+@pytest.fixture
+def ws_subscribed(ws_registered, subscribe_ws, subscription_fqi):
+    subscribe_ws(ws_registered, subscription_fqi)
+    return ws_registered

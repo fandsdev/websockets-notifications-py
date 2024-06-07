@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
 import logging
-from typing import cast
 
 from websockets.server import WebSocketServerProtocol
 

@@ -24,10 +24,9 @@ class StorageUserUnsubscriber(BaseService):
         user_id = self.storage.get_websocket_user_id(self.websocket)
 
         if not user_id:
-            raise StorageOperationException("The user is not authenticated")
+            raise StorageOperationException("The user is not registered")
 
         return user_id
-
 
     def act(self) -> None:
         if self.is_user_has_subscription():

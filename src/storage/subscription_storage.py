@@ -48,8 +48,4 @@ class SubscriptionStorage:
     def get_expired_websockets(self) -> list[WebSocketServerProtocol]:
         now_timestamp = time.time()
 
-        return [
-            websocket
-            for websocket, websocket_meta in self.registered_websockets.items()
-            if websocket_meta.expiration_timestamp <= now_timestamp
-        ]
+        return [websocket for websocket, websocket_meta in self.registered_websockets.items() if websocket_meta.expiration_timestamp <= now_timestamp]

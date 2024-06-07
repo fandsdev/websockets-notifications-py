@@ -12,7 +12,6 @@ from jwt.exceptions import PyJWKSetError
 from jwt.jwk_set_cache import JWKSetCache
 
 
-
 from app.types import DecodedValidToken
 
 

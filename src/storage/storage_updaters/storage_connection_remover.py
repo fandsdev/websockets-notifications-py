@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 import logging
+from typing import cast
 
 from websockets.server import WebSocketServerProtocol
+from functools import cached_property
 
 from app.services import BaseService
 from app.types import UserId
@@ -23,37 +25,38 @@ class StorageConnectionRemover(BaseService):
     storage: SubscriptionStorage
     websocket: WebSocketServerProtocol
 
+    @cached_property
+    def websocket_user_id(self) -> UserId:
+        return cast(UserId, self.storage.get_websocket_user_id(self.websocket))
+
     def act(self) -> None:
-        user_id = self.storage.get_websocket_user_id(self.websocket)
+        if not self.storage.is_websocket_registered(self.websocket):
+            return None
 
-        if not user_id:
-            logger.info("Removing not registered connection with id = '%s', nothing to do with storage", str(self.websocket.id))
-            return
-
-        if self.is_last_user_websocket(user_id):
-            self.remove_user_subscriptions(user_id)
-            self.remove_user_connections(user_id)
+        if self.is_last_user_websocket():
+            self.remove_user_subscriptions()
+            self.remove_user_connections()
         else:
-            self.remove_websocket_from_user_connections(user_id)
+            self.remove_websocket_from_user_connections()
 
         self.remove_websocket_from_registered_websockets()
 
-    def is_last_user_websocket(self, user_id: UserId) -> bool:
-        return len(self.storage.user_connections[user_id].websockets) == 1
+    def is_last_user_websocket(self) -> bool:
+        return len(self.storage.user_connections[self.websocket_user_id].websockets) == 1
 
-    def remove_user_subscriptions(self, user_id: UserId) -> None:
-        user_connection_fqis = self.storage.user_connections[user_id].user_subscriptions.copy()
+    def remove_user_subscriptions(self) -> None:
+        user_connection_fqis = self.storage.user_connections[self.websocket_user_id].user_subscriptions.copy()
 
         for subscription_fqi in user_connection_fqis:
-            StorageUserSubscriptionRemover(self.storage, user_id, subscription_fqi)()
+            StorageUserSubscriptionRemover(self.storage, self.websocket_user_id, subscription_fqi)()
 
-    def remove_user_connections(self, user_id: UserId) -> None:
-        del self.storage.user_connections[user_id]
-        logger.info("The last connection for user removed from storage. User ID: '%s'", user_id)
+    def remove_user_connections(self) -> None:
+        del self.storage.user_connections[self.websocket_user_id]
+        logger.info("The last connection for user removed from storage. User ID: '%s'", self.websocket_user_id)
 
-    def remove_websocket_from_user_connections(self, user_id: UserId) -> None:
-        self.storage.user_connections[user_id].websockets.remove(self.websocket)
-        logger.info("Websocket removed form user connections. UserId: `%s`, WebsocketId: `%s`", user_id, str(self.websocket.id))
+    def remove_websocket_from_user_connections(self) -> None:
+        self.storage.user_connections[self.websocket_user_id].websockets.remove(self.websocket)
+        logger.info("Websocket removed form user connections. UserId: `%s`, WebsocketId: `%s`", self.websocket_user_id, str(self.websocket.id))
 
     def remove_websocket_from_registered_websockets(self) -> None:
         del self.storage.registered_websockets[self.websocket]

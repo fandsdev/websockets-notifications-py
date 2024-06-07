@@ -29,8 +29,13 @@ class StorageUserSubscriber(BaseService):
         return user_id
 
     def act(self) -> None:
+        self.validate_websocket_registered()
+
         self.update_storage_subscriptions()
         self.update_user_subscriptions()
+
+    def validate_websocket_registered(self) -> UserId:
+        return self.websocket_user_id  # access to property
 
     def update_storage_subscriptions(self) -> None:
         event, _, event_subscription_identifier = self.subscription_fqi

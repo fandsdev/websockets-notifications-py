@@ -6,12 +6,6 @@ from storage.types import SubscriptionFullQualifiedIdentifier
 
 
 @pytest.fixture
-def ws_subscribed(ws_authenticated, subscribe_ws, subscription_fqi):
-    subscribe_ws(ws_authenticated, subscription_fqi)
-    return ws_authenticated
-
-
-@pytest.fixture
 def unsubscribe(storage):
     def unsubscribe_user(ws, subscription_fqi):
         StorageUserUnsubscriber(
@@ -55,9 +49,9 @@ def test_same_user_other_subscription_key_unsubscribe_ok(unsubscribe, subscribe_
 
 
 @pytest.mark.usefixtures("ws_subscribed")
-def test_raise_if_user_not_authenticated(unsubscribe, ya_ws_connection, storage, subscription_fqi):
-    with pytest.raises(StorageOperationException, match="The user is not authenticated"):
-        unsubscribe(ya_ws_connection, subscription_fqi)
+def test_raise_if_user_not_registered(unsubscribe, ya_ws, storage, subscription_fqi):
+    with pytest.raises(StorageOperationException, match="The user is not registered"):
+        unsubscribe(ya_ws, subscription_fqi)
 
     assert len(storage.subscriptions) == 1, "Should not changed"
     assert len(storage.user_connections["user1"].user_subscriptions) == 1, "Should not changed"
