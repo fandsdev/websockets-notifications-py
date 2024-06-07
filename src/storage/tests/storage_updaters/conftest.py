@@ -4,7 +4,6 @@ from app.types import DecodedValidToken
 from app.testing import MockedWebSocketServerProtocol
 from storage.storage_updaters.storage_connection_register import StorageConnectionRegister
 from storage.storage_updaters.storage_user_subscriber import StorageUserSubscriber
-from storage.types import SubscriptionFullQualifiedIdentifier
 
 
 @pytest.fixture
@@ -48,41 +47,27 @@ def ws_registered(ws, valid_token, register_ws):
 
 @pytest.fixture
 def event():
-    return "omniNotification"
+    return "boobs"
 
 
 @pytest.fixture
-def event_subscription_key():
-    return ("userId",)
-
-
-@pytest.fixture
-def event_subscription_identifier():
-    return ("userX",)
-
-
-@pytest.fixture
-def subscription_fqi(event, event_subscription_key, event_subscription_identifier):
-    return SubscriptionFullQualifiedIdentifier(
-        event=event,
-        subscription_key=event_subscription_key,
-        subscription_identifier=event_subscription_identifier,
-    )
+def ya_event():
+    return "boobs-boobs"
 
 
 @pytest.fixture
 def subscribe_ws(storage):
-    def subscribe(ws, subscription_fqi):
+    def subscribe(ws, event):
         StorageUserSubscriber(
             storage=storage,
             websocket=ws,
-            subscription_fqi=subscription_fqi,
+            event=event,
         )()
 
     return subscribe
 
 
 @pytest.fixture
-def ws_subscribed(ws_registered, subscribe_ws, subscription_fqi):
-    subscribe_ws(ws_registered, subscription_fqi)
+def ws_subscribed(ws_registered, subscribe_ws, event):
+    subscribe_ws(ws_registered, event)
     return ws_registered

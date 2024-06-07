@@ -27,6 +27,7 @@ dev = [
     "respx",
 
     "dotenv-linter",
+    "ruff",
     "mypy",
 ]
 
