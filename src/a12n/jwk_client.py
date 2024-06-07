@@ -12,7 +12,9 @@ from jwt.exceptions import PyJWKSetError
 from jwt.jwk_set_cache import JWKSetCache
 
 
-from a12n.types import DecodedValidToken
+
+from app.types import DecodedValidToken
+
 
 logger = logging.getLogger(__name__)
 
