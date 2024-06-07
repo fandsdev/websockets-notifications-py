@@ -1,6 +1,7 @@
 [project]
 name = "websockets-notification-py"
 version = "0.0.1"
+requires-python = ">=3.12"
 dependencies = [
     "websockets",
     "aio-pika",
@@ -32,7 +33,6 @@ dev = [
 
 [tool.ruff]
 line-length = 160
-target-version = "py312"
 
 
 [tool.roof.lint]
