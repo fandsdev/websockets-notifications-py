@@ -8,14 +8,12 @@ from app.types import Event
 from app.types import UserId
 from storage.types import ConnectedUserMeta
 from storage.types import WebSocketMeta
-from storage.types import EventSubscriptionIdentifier
-from storage.types import EventSubscriptionsBucket
 
 
 @dataclass
 class SubscriptionStorage:
     registered_websockets: dict[WebSocketServerProtocol, WebSocketMeta] = field(default_factory=dict)
-    subscriptions: dict[Event, EventSubscriptionsBucket] = field(default_factory=dict)
+    subscriptions: dict[Event, set[UserId]] = field(default_factory=dict)
     user_connections: dict[UserId, ConnectedUserMeta] = field(default_factory=dict)
 
     def is_websocket_registered(self, websocket: WebSocketServerProtocol) -> bool:
@@ -28,8 +26,8 @@ class SubscriptionStorage:
         websocket_meta = self.registered_websockets.get(websocket)
         return websocket_meta.user_id if websocket_meta else None
 
-    def get_event_subscribers_user_ids(self, event: Event, identifier: EventSubscriptionIdentifier) -> set[UserId]:
-        return self.subscriptions.get(event, {}).get(identifier, set())
+    def get_event_subscribers_user_ids(self, event: Event) -> set[UserId]:
+        return self.subscriptions.get(event) or set()
 
     def is_event_active(self, event: Event) -> bool:
         return event in self.subscriptions

@@ -6,9 +6,9 @@ from websockets.server import WebSocketServerProtocol
 
 from app.services import BaseService
 from app.types import UserId
+from app.types import Event
 from storage.exceptions import StorageOperationException
 from storage.subscription_storage import SubscriptionStorage
-from storage.types import SubscriptionFullQualifiedIdentifier
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class StorageUserUnsubscriber(BaseService):
     storage: SubscriptionStorage
     websocket: WebSocketServerProtocol
-    subscription_fqi: SubscriptionFullQualifiedIdentifier
+    event: Event
 
     @cached_property
     def websocket_user_id(self) -> UserId:
@@ -33,39 +33,33 @@ class StorageUserUnsubscriber(BaseService):
             StorageUserSubscriptionRemover(
                 self.storage,
                 self.websocket_user_id,
-                self.subscription_fqi,
+                self.event,
             )()
 
     def is_user_has_subscription(self) -> bool:
-        return self.subscription_fqi in self.storage.user_connections[self.websocket_user_id].user_subscriptions
+        return self.event in self.storage.user_connections[self.websocket_user_id].user_subscriptions
 
 
 @dataclass
 class StorageUserSubscriptionRemover(BaseService):
     storage: SubscriptionStorage
     user_id: UserId
-    subscription_fqi: SubscriptionFullQualifiedIdentifier
+    event: Event
 
     def act(self) -> None:
         self.remove_storage_subscription()
         self.update_user_subscriptions()
 
     def remove_storage_subscription(self) -> None:
-        event, _, event_subscription_identifier = self.subscription_fqi
+        event_subscriptions = self.storage.subscriptions[self.event]
 
-        event_subscriptions = self.storage.subscriptions[event]
+        event_subscriptions.discard(self.user_id)
+        logger.info("User unsubscribed from event. User: '%s', Event '%s'", self.user_id, self.event)
 
-        event_subscriptions[event_subscription_identifier].discard(self.user_id)
-        logger.info("User unsubscribed from event. User: '%s', subscription_fqi '%s'", self.user_id, self.subscription_fqi)
-
-        if not event_subscriptions[event_subscription_identifier]:
-            del event_subscriptions[event_subscription_identifier]
-            logger.info("Subscription identifier removed from event in storage. Event: '%s', identifier: '%s'", event, event_subscription_identifier)
-
-        if not self.storage.subscriptions[event]:
-            del self.storage.subscriptions[event]
-            logger.info("Event from storage removed cause empty. Event: '%s'", event)
+        if not event_subscriptions:
+            del self.storage.subscriptions[self.event]
+            logger.info("Event record removed from storage cause has no subscribers. Event: '%s'", self.event)
 
     def update_user_subscriptions(self) -> None:
-        self.storage.user_connections[self.user_id].user_subscriptions.discard(self.subscription_fqi)
-        logger.info("Subscription removed from user. User: '%s', subscription_fqi: '%s'", self.user_id, self.subscription_fqi)
+        self.storage.user_connections[self.user_id].user_subscriptions.discard(self.event)
+        logger.info("Subscription removed from user. User: '%s', event: '%s'", self.user_id, self.event)

@@ -18,21 +18,8 @@ class WebSocketMeta:
     expiration_timestamp: int
 
 
-EventSubscriptionKey = tuple[str, ...]  # ordered keys used to subscribe to specific event
-EventSubscriptionIdentifier = tuple[int | str, ...]  # values matched to subscription key
-EventSubscriptionsBucket = dict[EventSubscriptionIdentifier, set[UserId]]  # bucket of subscriptions for specific event
-
-
-class SubscriptionFullQualifiedIdentifier(NamedTuple):
-    """Necessary and sufficient data to create user subscription in storage."""
-
-    event: Event
-    subscription_key: EventSubscriptionKey
-    subscription_identifier: EventSubscriptionIdentifier
-
-
 class ConnectedUserMeta(NamedTuple):
     """Data related to exact user."""
 
     websockets: list[WebSocketServerProtocol]
-    user_subscriptions: set[SubscriptionFullQualifiedIdentifier]
+    user_subscriptions: set[Event]
