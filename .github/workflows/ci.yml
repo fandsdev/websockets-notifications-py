@@ -1,0 +1,43 @@
+---
+name: CI
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version-file: '.python-version'
+
+      - uses: actions/cache@v4
+        id: cache-dependencies
+        with:
+          path: |
+            .venv
+          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/*requirements.txt') }}
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: |
+          pip install uv ruff
+          uv venv
+          source .venv/bin/activate
+          make install-dev-deps
+
+      - name: Set up environment vars
+        run: |
+          cp env.example src/tp.env
+
+      - name: Run the linter
+        run: |
+          source .venv/bin/activate
+          make lint
+
+      - name: Run the tests
+        run: |
+          source .venv/bin/activate
+          make test
