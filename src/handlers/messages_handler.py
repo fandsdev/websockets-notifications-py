@@ -40,7 +40,7 @@ class WebSocketMessagesHandler:
 
     async def handle_auth_message(self, websocket: WebSocketServerProtocol, message: AuthMessage) -> SuccessResponseMessage:
         try:
-            validated_token = await self.jwk_client.decode(message.params.token)
+            validated_token = await self.jwk_client.decode(message.params.token.get_secret_value())
             StorageWebSocketRegister(storage=self.storage, websocket=websocket, validated_token=validated_token)()
         except (AsyncJWKClientException, StorageOperationException) as exc:
             raise WebsocketMessageException(str(exc), message)

@@ -12,7 +12,7 @@ def test_message_handler_jwk_client_settings(message_handler):
     assert message_handler.jwk_client.supported_signing_algorithms == ["RS256"]
 
 
-@pytest.mark.usefixtures("force_token_on_validation")
+@pytest.mark.usefixtures("force_token_validation")
 async def test_message_handler_call_auth_handler_on_auth_message(get_message_handler, auth_message, mocker, ws):
     spy_auth_handler = mocker.spy(WebSocketMessagesHandler, "handle_auth_message")
 
