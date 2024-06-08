@@ -1,6 +1,6 @@
 import pytest
 
-from handlers import WebSocketMessageHandler
+from handlers.messages_handler import WebSocketMessagesHandler
 from handlers.dto import AuthMessage, SubscribeMessage, UnsubscribeMessage
 
 
@@ -12,13 +12,13 @@ def settings(settings):
 
 
 @pytest.fixture
-def force_token_on_validation(mocker, valid_token):
+def force_token_validation(mocker, valid_token):
     return mocker.patch("a12n.jwk_client.AsyncJWKClient.decode", return_value=valid_token)
 
 
 @pytest.fixture
 def message_handler(storage):
-    return WebSocketMessageHandler(storage=storage)
+    return WebSocketMessagesHandler(storage=storage)
 
 
 @pytest.fixture

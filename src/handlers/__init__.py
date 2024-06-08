@@ -1,5 +1,5 @@
-from handlers.message_handler import WebSocketMessageHandler
+from handlers.websockets_handler import WebSocketsHandler
 
 __all__ = [
-    "WebSocketMessageHandler",
+    "WebSocketsHandler",
 ]

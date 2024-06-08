@@ -1,6 +1,7 @@
 from typing import Literal
 
-from pydantic import Field
+from pydantic_core import ErrorDetails
+from pydantic import SecretStr
 
 from pydantic import BaseModel
 from app.types import Event
@@ -10,13 +11,13 @@ messageId = int | str
 
 
 class AuthMessageParams(BaseModel):
-    token: str
+    token: SecretStr
 
 
 class AuthMessage(BaseModel):
     message_id: messageId
     message_type: Literal["Authenticate"]
-    params: AuthMessageParams = Field(exclude=True)
+    params: AuthMessageParams
 
 
 class SubscribeParams(BaseModel):
@@ -45,5 +46,5 @@ class SuccessResponseMessage(BaseModel):
 
 class ErrorResponseMessage(BaseModel):
     message_type: Literal["ErrorResponse"] = "ErrorResponse"
-    error_detail: str
+    errors: list[ErrorDetails | str]
     incoming_message: IncomingMessage | None  # may be null if incoming message was not valid

@@ -1,10 +1,10 @@
 import pytest
-from handlers.message_handler import WebSocketMessageHandler
+from handlers.messages_handler import WebSocketMessagesHandler
 from storage.storage_updaters import StorageUserUnsubscriber
 
 
 @pytest.fixture
-def unsubscribe_handler(message_handler: WebSocketMessageHandler, ws_subscribed):
+def unsubscribe_handler(message_handler: WebSocketMessagesHandler, ws_subscribed):
     return lambda unsubscribe_message: message_handler.handle_unsubscribe_message(ws_subscribed, unsubscribe_message)
 
 

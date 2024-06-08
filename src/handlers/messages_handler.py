@@ -22,7 +22,7 @@ AsyncMessageHandler = Callable[[WebSocketServerProtocol, Any], Coroutine[Any, An
 
 
 @dataclass
-class WebSocketMessageHandler:
+class WebSocketMessagesHandler:
     storage: SubscriptionStorage
 
     def __post_init__(self) -> None:
@@ -40,7 +40,7 @@ class WebSocketMessageHandler:
 
     async def handle_auth_message(self, websocket: WebSocketServerProtocol, message: AuthMessage) -> SuccessResponseMessage:
         try:
-            validated_token = await self.jwk_client.decode(message.params.token)
+            validated_token = await self.jwk_client.decode(message.params.token.get_secret_value())
             StorageWebSocketRegister(storage=self.storage, websocket=websocket, validated_token=validated_token)()
         except (AsyncJWKClientException, StorageOperationException) as exc:
             raise WebsocketMessageException(str(exc), message)
