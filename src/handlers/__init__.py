@@ -1,5 +1,5 @@
-from handlers.websocket_auth_message_handler import WebsocketAuthMessageHandler
+from handlers.message_handler import WebSocketMessageHandler
 
 __all__ = [
-    "WebsocketAuthMessageHandler",
+    "WebSocketMessageHandler",
 ]
