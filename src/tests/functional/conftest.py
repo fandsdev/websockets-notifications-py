@@ -5,7 +5,8 @@ import pytest
 from websockets import client
 
 from entrypoint import app_runner
-from handlers.websockets_handler import WebSocketsHandler
+from handlers import WebSocketsHandler
+from handlers import WebSocketsAccessGuardian
 
 
 @pytest.fixture
@@ -24,18 +25,31 @@ def websockets_handler(storage):
     return WebSocketsHandler(storage=storage)
 
 
+@pytest.fixture
+async def stop_signal():
+    return asyncio.Future()
+
+
+@pytest.fixture
+async def access_guardian(storage, stop_signal):
+    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5, stop_signal=stop_signal)
+
+
 @pytest.fixture(autouse=True)
-async def serve_app_runner(settings, websockets_handler):
+async def serve_app_runner(settings, websockets_handler, access_guardian, stop_signal):
     serve_task = asyncio.get_running_loop().create_task(
         app_runner(
             settings=settings,
             websockets_handler=websockets_handler,
+            access_guardian=access_guardian,
         ),
     )
 
     await asyncio.sleep(0.1)  # give enough time to start the server
     assert serve_task.done() is False  # be sure server is running
-    return serve_task
+    yield serve_task
+
+    stop_signal.set_result(None)
 
 
 @pytest.fixture
