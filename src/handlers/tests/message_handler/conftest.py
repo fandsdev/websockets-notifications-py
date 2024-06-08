@@ -1,6 +1,6 @@
 import pytest
 
-from handlers import WebSocketMessageHandler
+from handlers import WebSocketMessagesHandler
 from handlers.dto import AuthMessage, SubscribeMessage, UnsubscribeMessage
 
 
@@ -18,7 +18,7 @@ def force_token_on_validation(mocker, valid_token):
 
 @pytest.fixture
 def message_handler(storage):
-    return WebSocketMessageHandler(storage=storage)
+    return WebSocketMessagesHandler(storage=storage)
 
 
 @pytest.fixture

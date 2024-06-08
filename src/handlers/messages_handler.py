@@ -22,7 +22,7 @@ AsyncMessageHandler = Callable[[WebSocketServerProtocol, Any], Coroutine[Any, An
 
 
 @dataclass
-class WebSocketMessageHandler:
+class WebSocketMessagesHandler:
     storage: SubscriptionStorage
 
     def __post_init__(self) -> None:

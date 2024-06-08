@@ -4,7 +4,7 @@ from a12n.jwk_client import AsyncJWKClientException
 from app.types import DecodedValidToken
 from handlers.dto import SuccessResponseMessage
 from handlers.exceptions import WebsocketMessageException
-from handlers import WebSocketMessageHandler
+from handlers import WebSocketMessagesHandler
 from storage.storage_updaters import StorageWebSocketRegister
 
 pytestmark = [
@@ -18,7 +18,7 @@ def ya_user_decoded_valid_token():
 
 
 @pytest.fixture
-def auth_handler(message_handler: WebSocketMessageHandler, ws):
+def auth_handler(message_handler: WebSocketMessagesHandler, ws):
     return lambda auth_message: message_handler.handle_auth_message(ws, auth_message)
 
 

@@ -1,10 +1,10 @@
 import pytest
-from handlers.message_handler import WebSocketMessageHandler
+from handlers.messages_handler import WebSocketMessagesHandler
 from storage.storage_updaters import StorageUserSubscriber
 
 
 @pytest.fixture
-def subscribe_handler(message_handler: WebSocketMessageHandler, ws_registered):
+def subscribe_handler(message_handler: WebSocketMessagesHandler, ws_registered):
     return lambda subscribe_message: message_handler.handle_subscribe_message(ws_registered, subscribe_message)
 
 
