@@ -24,13 +24,17 @@ def get_guardian_enough_time_to_do_its_job():
 
 
 @pytest.fixture
-def guardian(storage):
-    return WebSocketsAccessGuardian(storage=storage, check_interval=0.1)
+async def guardian(storage):
+    stop_signal = asyncio.Future()  # it's better to use loop.create_future() but ok for tests
+
+    yield WebSocketsAccessGuardian(storage=storage, check_interval=0.1, stop_signal=stop_signal)
+
+    stop_signal.set_result(None)
 
 
 @pytest.fixture(autouse=True)
 def guardian_as_task(guardian, event_loop):
-    return event_loop.create_task(guardian.run_validate_access())
+    return event_loop.create_task(guardian.run())
 
 
 @pytest.fixture(autouse=True)

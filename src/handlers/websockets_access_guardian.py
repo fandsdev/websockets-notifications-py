@@ -1,5 +1,5 @@
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
 
 import websockets
@@ -15,13 +15,10 @@ logger = logging.getLogger(__name__)
 class WebSocketsAccessGuardian:
     storage: SubscriptionStorage
     check_interval: float = 60.0  # in seconds
-    stop_signal: asyncio.Future[None] | None = None
+    stop_signal: asyncio.Future[None] = field(default_factory=asyncio.Future)  # default feature will run forever
 
-    def is_guardian_stopped(self) -> bool:
-        return self.stop_signal.done() if self.stop_signal else False
-
-    async def run_validate_access(self) -> None:
-        while not self.is_guardian_stopped():
+    async def run(self) -> None:
+        while True:
             await asyncio.sleep(self.check_interval)
 
             self.monitor_and_manage_access()
