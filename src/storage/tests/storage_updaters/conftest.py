@@ -2,7 +2,7 @@ import pytest
 
 from app.types import DecodedValidToken
 from app.testing import MockedWebSocketServerProtocol
-from storage.storage_updaters.storage_connection_register import StorageConnectionRegister
+from storage.storage_updaters.storage_websocket_register import StorageWebSocketRegister
 from storage.storage_updaters.storage_user_subscriber import StorageUserSubscriber
 
 
@@ -34,7 +34,7 @@ def ya_ws():
 @pytest.fixture
 def register_ws(storage):
     def register(ws, token):
-        StorageConnectionRegister(storage, ws, token)()
+        StorageWebSocketRegister(storage, ws, token)()
 
     return register
 

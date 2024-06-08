@@ -1,7 +1,7 @@
 import pytest
 
 from storage.exceptions import StorageOperationException
-from storage.storage_updaters import StorageConnectionRegister
+from storage.storage_updaters import StorageWebSocketRegister
 from storage.subscription_storage import SubscriptionStorage
 from storage.types import ConnectedUserMeta
 from storage.types import WebSocketMeta
@@ -9,7 +9,7 @@ from storage.types import WebSocketMeta
 
 @pytest.fixture
 def register(storage: SubscriptionStorage):
-    return lambda ws, token: StorageConnectionRegister(
+    return lambda ws, token: StorageWebSocketRegister(
         storage=storage,
         websocket=ws,
         validated_token=token,
