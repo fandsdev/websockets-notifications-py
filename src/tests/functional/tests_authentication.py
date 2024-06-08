@@ -2,12 +2,8 @@ import pytest
 
 pytestmark = [
     pytest.mark.rabbitmq,
+    pytest.mark.usefixtures("force_token_validation"),
 ]
-
-
-@pytest.fixture(autouse=True)
-def force_token_validation(mocker, valid_token):
-    return mocker.patch("a12n.jwk_client.AsyncJWKClient.decode", return_value=valid_token)
 
 
 async def test_zero_connected_clients_on_server_start(storage):

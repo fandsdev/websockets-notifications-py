@@ -8,6 +8,11 @@ from entrypoint import app_runner
 from handlers.websockets_handler import WebSocketsHandler
 
 
+@pytest.fixture
+def force_token_validation(mocker, valid_token):
+    return mocker.patch("a12n.jwk_client.AsyncJWKClient.decode", return_value=valid_token)
+
+
 @pytest.fixture(autouse=True)
 def _adjust_settings(settings, unused_tcp_port):
     settings.WEBSOCKETS_HOST = "0.0.0.0"
@@ -87,5 +92,5 @@ def auth_message(auth_message_data):
 
 
 @pytest.fixture
-async def client_ws_authenticated(auth_message, ws_client_send_and_recv, ws_client, force_token_validation):
+async def ws_client_authenticated(auth_message, ws_client_send_and_recv, ws_client, force_token_validation):
     return await ws_client_send_and_recv(ws_client, auth_message)
