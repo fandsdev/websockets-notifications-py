@@ -2,6 +2,11 @@ import pytest
 
 from app.conf import Settings
 
+pytest_plugins = [
+    "app.fixtures",
+    "storage.fixtures",
+]
+
 
 @pytest.fixture(autouse=True)
 def settings(mocker):

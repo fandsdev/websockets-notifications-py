@@ -1,9 +1,14 @@
 import pytest
 
 from app.types import DecodedValidToken
-from app.testing import MockedWebSocketServerProtocol
 from storage.storage_updaters.storage_websocket_register import StorageWebSocketRegister
 from storage.storage_updaters.storage_user_subscriber import StorageUserSubscriber
+from storage import SubscriptionStorage
+
+
+@pytest.fixture
+def storage():
+    return SubscriptionStorage()
 
 
 @pytest.fixture
@@ -19,16 +24,6 @@ def ya_valid_token():
 @pytest.fixture
 def ya_user_valid_token():
     return DecodedValidToken(sub="user2", exp=7700000000)
-
-
-@pytest.fixture
-def ws():
-    return MockedWebSocketServerProtocol()
-
-
-@pytest.fixture
-def ya_ws():
-    return MockedWebSocketServerProtocol()
 
 
 @pytest.fixture
