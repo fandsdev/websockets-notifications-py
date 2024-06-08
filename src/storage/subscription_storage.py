@@ -29,7 +29,7 @@ class SubscriptionStorage:
     def get_event_subscribers_user_ids(self, event: Event) -> set[UserId]:
         return self.subscriptions.get(event) or set()
 
-    def is_event_active(self, event: Event) -> bool:
+    def is_event_has_subscribers(self, event: Event) -> bool:
         return event in self.subscriptions
 
     def get_users_websockets(self, user_ids: set[UserId]) -> list[WebSocketServerProtocol]:

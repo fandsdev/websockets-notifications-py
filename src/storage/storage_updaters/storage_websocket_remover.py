@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class StorageConnectionRemover(BaseService):
+class StorageWebSocketRemover(BaseService):
     """ "Remove connection from storage.
 
     If websocket is not registered then nothing to do.

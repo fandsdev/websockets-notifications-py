@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class StorageConnectionRegister(BaseService):
+class StorageWebSocketRegister(BaseService):
     """Add or update websocket in storage
 
     If websocket not registered: just register it.

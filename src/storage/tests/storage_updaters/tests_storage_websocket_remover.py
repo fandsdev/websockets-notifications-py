@@ -1,7 +1,7 @@
 from contextlib import nullcontext as does_not_raise
 import pytest
 
-from storage.storage_updaters import StorageConnectionRemover
+from storage.storage_updaters import StorageWebSocketRemover
 
 
 @pytest.fixture
@@ -12,7 +12,7 @@ def ya_user_ws_registered(ya_ws, ya_user_valid_token, register_ws):
 
 @pytest.fixture
 def remove(storage):
-    return lambda ws: StorageConnectionRemover(storage, ws)()
+    return lambda ws: StorageWebSocketRemover(storage, ws)()
 
 
 def test_remove_websocket_and_user_subscriptions_from_storage(remove, ws_subscribed, storage):
