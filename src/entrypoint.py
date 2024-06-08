@@ -16,12 +16,14 @@ def create_stop_signal() -> asyncio.Future[None]:
 
 
 async def app_runner(settings: conf.Settings, websockets_handler: WebSocketsHandler) -> None:
+    stop_signal = create_stop_signal()
+
     async with websockets.serve(
         ws_handler=websockets_handler.websockets_handler,
         host=settings.WEBSOCKETS_HOST,
         port=settings.WEBSOCKETS_PORT,
     ):
-        await asyncio.Future()
+        await stop_signal
 
 
 async def main() -> None:
