@@ -8,13 +8,7 @@ from typing import AsyncGenerator
 
 @pytest.fixture(autouse=True)
 def _adjust_settings(settings):
-    settings.BROKER_URL = "amqp://guest:guest@localhost/"
-    settings.BROKER_EXCHANGE = "test-exchange"
-    settings.BROKER_QUEUE = "test-queue"
-    settings.BROKER_ROUTING_KEYS_CONSUME_FROM = [
-        "event-routing-key",
-        "ya-event-routing-key",
-    ]
+    settings.BROKER_QUEUE = None  # force consumer to create a queue with a random name
 
 
 @pytest.fixture

@@ -17,6 +17,7 @@ def force_token_validation(mocker, valid_token):
 
 @pytest.fixture(autouse=True)
 def _adjust_settings(settings, unused_tcp_port):
+    settings.BROKER_QUEUE = None  # force consumer to create a queue with a random name
     settings.WEBSOCKETS_HOST = "0.0.0.0"
     settings.WEBSOCKETS_PORT = unused_tcp_port
 
@@ -54,11 +55,10 @@ async def serve_app_runner(settings, websockets_handler, access_guardian, consum
     )
 
     await asyncio.sleep(0.1)  # give enough time to start the server
-    assert serve_task.done() is False  # be sure server is running
+    assert serve_task.done() is False, "It's looks like app runner couldn't be started. Check the settings carefully."
     yield serve_task
 
     stop_signal.set_result(None)
-    await asyncio.sleep(0.2)  # give enough time to stop the server; it's required to free all the consumed resources
 
 
 @pytest.fixture

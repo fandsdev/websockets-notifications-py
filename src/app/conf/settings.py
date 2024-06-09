@@ -9,7 +9,7 @@ from pydantic_settings import SettingsConfigDict
 class Settings(BaseSettings):
     BROKER_URL: AmqpDsn
     BROKER_EXCHANGE: str
-    BROKER_QUEUE: str
+    BROKER_QUEUE: str | None
     BROKER_ROUTING_KEYS_CONSUME_FROM: list[str]
     WEBSOCKETS_HOST: str
     WEBSOCKETS_PORT: int

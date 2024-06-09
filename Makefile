@@ -25,5 +25,8 @@ lint:
 	mypy
 
 test:
-	cd src && pytest -x
+	cd src && pytest -x -m "not rabbitmq"
+	cd src && pytest -x -m rabbitmq
 	cd src && pytest --dead-fixtures
+
+pr: fmt lint test
