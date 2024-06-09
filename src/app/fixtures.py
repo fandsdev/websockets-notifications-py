@@ -4,10 +4,15 @@ from app.testing import MockedWebSocketServerProtocol
 
 
 @pytest.fixture
-def ws():
-    return MockedWebSocketServerProtocol()
+def create_ws():
+    return lambda: MockedWebSocketServerProtocol()
 
 
 @pytest.fixture
-def ya_ws():
-    return MockedWebSocketServerProtocol()
+def ws(create_ws):
+    return create_ws()
+
+
+@pytest.fixture
+def ya_ws(create_ws):
+    return create_ws()

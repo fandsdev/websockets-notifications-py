@@ -26,22 +26,15 @@ class SubscriptionStorage:
         websocket_meta = self.registered_websockets.get(websocket)
         return websocket_meta.user_id if websocket_meta else None
 
-    def get_event_subscribers_user_ids(self, event: Event) -> set[UserId]:
-        return self.subscriptions.get(event) or set()
+    def get_event_subscribers_websockets(self, event: Event) -> list[WebSocketServerProtocol]:
+        subscribers_user_ids = self.subscriptions.get(event) or set()
 
-    def is_event_has_subscribers(self, event: Event) -> bool:
-        return event in self.subscriptions
+        user_websockets = []
 
-    def get_users_websockets(self, user_ids: set[UserId]) -> list[WebSocketServerProtocol]:
-        users_websockets = []
+        for user_id in subscribers_user_ids:
+            user_websockets.extend(self.user_connections[user_id].websockets)
 
-        for user_id in user_ids:
-            user_connection_meta = self.user_connections.get(user_id)
-
-            if user_connection_meta:
-                users_websockets.extend(user_connection_meta.websockets)
-
-        return users_websockets
+        return user_websockets
 
     def get_expired_websockets(self) -> list[WebSocketServerProtocol]:
         now_timestamp = time.time()
