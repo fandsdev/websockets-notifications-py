@@ -7,6 +7,7 @@ from websockets import client
 from entrypoint import app_runner
 from handlers import WebSocketsHandler
 from handlers import WebSocketsAccessGuardian
+from consumer import Consumer
 
 
 @pytest.fixture
@@ -31,17 +32,24 @@ async def stop_signal():
 
 
 @pytest.fixture
-async def access_guardian(storage, stop_signal):
-    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5, stop_signal=stop_signal)
+def access_guardian(storage):
+    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5)
+
+
+@pytest.fixture
+def consumer(storage):
+    return Consumer(storage=storage)
 
 
 @pytest.fixture(autouse=True)
-async def serve_app_runner(settings, websockets_handler, access_guardian, stop_signal):
-    serve_task = asyncio.get_running_loop().create_task(
+async def serve_app_runner(settings, websockets_handler, access_guardian, consumer, stop_signal):
+    serve_task = asyncio.create_task(
         app_runner(
             settings=settings,
             websockets_handler=websockets_handler,
             access_guardian=access_guardian,
+            consumer=consumer,
+            stop_signal=stop_signal,
         ),
     )
 
@@ -50,6 +58,7 @@ async def serve_app_runner(settings, websockets_handler, access_guardian, stop_s
     yield serve_task
 
     stop_signal.set_result(None)
+    await asyncio.sleep(0.2)  # give enough time to stop the server; it's required to free all the consumed resources
 
 
 @pytest.fixture

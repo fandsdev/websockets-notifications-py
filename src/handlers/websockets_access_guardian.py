@@ -1,5 +1,5 @@
 import asyncio
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import logging
 
 import websockets
@@ -15,13 +15,18 @@ logger = logging.getLogger(__name__)
 class WebSocketsAccessGuardian:
     storage: SubscriptionStorage
     check_interval: float = 60.0  # in seconds
-    stop_signal: asyncio.Future[None] = field(default_factory=asyncio.Future)  # default feature will run forever
 
-    async def run(self) -> None:
-        while True:
-            await asyncio.sleep(self.check_interval)
+    async def run(self, stop_signal: asyncio.Future) -> None:
+        async def runner() -> None:
+            while True:
+                self.monitor_and_manage_access()
 
-            self.monitor_and_manage_access()
+                await asyncio.sleep(self.check_interval)
+
+        # Run the runner until the stop signal is set
+        runner_task = asyncio.create_task(runner())
+        await stop_signal
+        runner_task.cancel()
 
     def monitor_and_manage_access(self) -> None:
         expired_websockets = self.storage.get_expired_websockets()
