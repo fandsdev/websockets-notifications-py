@@ -15,7 +15,8 @@ def settings(mocker):
         return_value=Settings(
             BROKER_URL="amqp://guest:guest@localhost/",
             BROKER_EXCHANGE="test-exchange",
-            BROKER_ROUTING_KEYS=["test-routing-key", "ya-test-routing-key"],
+            BROKER_QUEUE="test-queue",
+            BROKER_ROUTING_KEYS_CONSUME_FROM=["test-routing-key", "ya-test-routing-key"],
             WEBSOCKETS_HOST="localhost",
             WEBSOCKETS_PORT=50000,
             WEBSOCKETS_PATH="/v2/test-subscription-websocket",

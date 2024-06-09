@@ -66,3 +66,13 @@ def subscribe_ws(storage):
 def ws_subscribed(ws_registered, subscribe_ws, event):
     subscribe_ws(ws_registered, event)
     return ws_registered
+
+
+@pytest.fixture
+def ws_register_and_subscribe(register_ws, subscribe_ws):
+    def register_and_subscribe(ws, token, event):
+        register_ws(ws, token)
+        subscribe_ws(ws, event)
+        return ws
+
+    return register_and_subscribe

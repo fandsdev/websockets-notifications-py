@@ -2,11 +2,14 @@ import asyncio
 import signal
 
 import websockets
+import logging
 
 from app import conf
 from handlers import WebSocketsHandler
 from handlers import WebSocketsAccessGuardian
 from storage.subscription_storage import SubscriptionStorage
+
+logging.basicConfig(level=logging.INFO)
 
 
 def create_stop_signal() -> asyncio.Future[None]:
