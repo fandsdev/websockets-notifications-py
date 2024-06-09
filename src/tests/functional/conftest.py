@@ -7,6 +7,7 @@ from websockets import client
 from entrypoint import app_runner
 from handlers import WebSocketsHandler
 from handlers import WebSocketsAccessGuardian
+from consumer import Consumer
 
 
 @pytest.fixture
@@ -16,6 +17,7 @@ def force_token_validation(mocker, valid_token):
 
 @pytest.fixture(autouse=True)
 def _adjust_settings(settings, unused_tcp_port):
+    settings.BROKER_QUEUE = None  # force consumer to create a queue with a random name
     settings.WEBSOCKETS_HOST = "0.0.0.0"
     settings.WEBSOCKETS_PORT = unused_tcp_port
 
@@ -31,22 +33,29 @@ async def stop_signal():
 
 
 @pytest.fixture
-async def access_guardian(storage, stop_signal):
-    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5, stop_signal=stop_signal)
+def access_guardian(storage):
+    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5)
+
+
+@pytest.fixture
+def consumer(storage):
+    return Consumer(storage=storage)
 
 
 @pytest.fixture(autouse=True)
-async def serve_app_runner(settings, websockets_handler, access_guardian, stop_signal):
-    serve_task = asyncio.get_running_loop().create_task(
+async def serve_app_runner(settings, websockets_handler, access_guardian, consumer, stop_signal):
+    serve_task = asyncio.create_task(
         app_runner(
             settings=settings,
             websockets_handler=websockets_handler,
             access_guardian=access_guardian,
+            consumer=consumer,
+            stop_signal=stop_signal,
         ),
     )
 
     await asyncio.sleep(0.1)  # give enough time to start the server
-    assert serve_task.done() is False  # be sure server is running
+    assert serve_task.done() is False, "It's looks like app runner couldn't be started. Check the settings carefully."
     yield serve_task
 
     stop_signal.set_result(None)

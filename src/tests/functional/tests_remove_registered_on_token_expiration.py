@@ -2,7 +2,7 @@ import asyncio
 import pytest
 
 pytestmark = [
-    pytest.mark.slow,
+    pytest.mark.rabbitmq,
 ]
 
 

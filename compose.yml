@@ -12,3 +12,5 @@ services:
       TZ: UTC
     tty: true
     command: /bin/bash
+    volumes:
+      - ./:/repo

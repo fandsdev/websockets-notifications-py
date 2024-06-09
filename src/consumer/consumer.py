@@ -30,7 +30,7 @@ class Consumer:
 
         self.broker_url: str = str(settings.BROKER_URL)
         self.exchange: str = settings.BROKER_EXCHANGE
-        self.queue: str = settings.BROKER_QUEUE
+        self.queue: str | None = settings.BROKER_QUEUE
         self.routing_keys_consume_from: list[str] = settings.BROKER_ROUTING_KEYS_CONSUME_FROM
 
     async def consume(self, stop_signal: asyncio.Future) -> None:
