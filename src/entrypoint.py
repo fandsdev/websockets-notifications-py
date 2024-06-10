@@ -1,14 +1,13 @@
 import asyncio
+import logging
 import signal
 
 import websockets
-import logging
 
 from app import conf
-from handlers import WebSocketsHandler
-from handlers import WebSocketsAccessGuardian
-from storage.subscription_storage import SubscriptionStorage
 from consumer import Consumer
+from handlers import WebSocketsAccessGuardian, WebSocketsHandler
+from storage.subscription_storage import SubscriptionStorage
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,14 +26,16 @@ async def app_runner(
     consumer: Consumer,
     stop_signal: asyncio.Future,
 ) -> None:
-    async with websockets.serve(
-        ws_handler=websockets_handler.websockets_handler,
-        host=settings.WEBSOCKETS_HOST,
-        port=settings.WEBSOCKETS_PORT,
+    async with (
+        websockets.serve(
+            ws_handler=websockets_handler.websockets_handler,
+            host=settings.WEBSOCKETS_HOST,
+            port=settings.WEBSOCKETS_PORT,
+        ),
+        asyncio.TaskGroup() as task_group,
     ):
-        async with asyncio.TaskGroup() as task_group:
-            task_group.create_task(access_guardian.run(stop_signal))
-            task_group.create_task(consumer.consume(stop_signal))
+        task_group.create_task(access_guardian.run(stop_signal))
+        task_group.create_task(consumer.consume(stop_signal))
 
 
 async def main() -> None:

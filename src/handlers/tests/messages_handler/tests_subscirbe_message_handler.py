@@ -1,4 +1,5 @@
 import pytest
+
 from handlers.messages_handler import WebSocketMessagesHandler
 from storage.storage_updaters import StorageUserSubscriber
 

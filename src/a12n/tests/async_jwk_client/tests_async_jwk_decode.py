@@ -1,6 +1,7 @@
-from contextlib import nullcontext as does_not_raise
-from a12n.jwk_client import AsyncJWKClientException
 import pytest
+from contextlib import nullcontext as does_not_raise
+
+from a12n.jwk_client import AsyncJWKClientException
 
 pytestmark = [
     pytest.mark.usefixtures("mock_success_response"),

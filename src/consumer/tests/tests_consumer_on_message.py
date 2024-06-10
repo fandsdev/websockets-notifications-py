@@ -1,6 +1,6 @@
-from contextlib import nullcontext as does_not_raise
 import json
 import pytest
+from contextlib import nullcontext as does_not_raise
 
 from consumer.tests.conftest import MockedIncomingMessage
 

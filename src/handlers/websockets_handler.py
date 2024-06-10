@@ -1,22 +1,18 @@
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import Annotated
 
 import pydantic
-from pydantic import Field
-from pydantic import TypeAdapter
+from pydantic import Field, TypeAdapter
 from websockets import WebSocketServerProtocol
 from websockets.exceptions import ConnectionClosedError
 
 from app import conf
-from handlers.dto import AuthMessage
-from handlers.dto import ErrorResponseMessage
-from handlers.dto import IncomingMessage
-from handlers.dto import SuccessResponseMessage
+from handlers.dto import AuthMessage, ErrorResponseMessage, IncomingMessage, SuccessResponseMessage
 from handlers.exceptions import WebsocketMessageException
+from handlers.messages_handler import WebSocketMessagesHandler
 from storage.storage_updaters import StorageWebSocketRemover
 from storage.subscription_storage import SubscriptionStorage
-from handlers.messages_handler import WebSocketMessagesHandler
 
 logger = logging.getLogger(__name__)
 

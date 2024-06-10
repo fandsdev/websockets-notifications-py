@@ -1,13 +1,11 @@
 from typing import Literal
 
+from pydantic import BaseModel, SecretStr
 from pydantic_core import ErrorDetails
-from pydantic import SecretStr
 
-from pydantic import BaseModel
 from app.types import Event
 
-
-messageId = int | str
+MessageId = int | str
 
 
 class AuthMessageParams(BaseModel):
@@ -15,7 +13,7 @@ class AuthMessageParams(BaseModel):
 
 
 class AuthMessage(BaseModel):
-    message_id: messageId
+    message_id: MessageId
     message_type: Literal["Authenticate"]
     params: AuthMessageParams
 
@@ -25,13 +23,13 @@ class SubscribeParams(BaseModel):
 
 
 class SubscribeMessage(BaseModel):
-    message_id: messageId
+    message_id: MessageId
     message_type: Literal["Subscribe"]
     params: SubscribeParams
 
 
 class UnsubscribeMessage(BaseModel):
-    message_id: messageId
+    message_id: MessageId
     message_type: Literal["Unsubscribe"]
     params: SubscribeParams
 

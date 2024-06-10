@@ -1,7 +1,7 @@
 import pytest
 
-from handlers.messages_handler import WebSocketMessagesHandler
 from handlers.dto import AuthMessage, SubscribeMessage, UnsubscribeMessage
+from handlers.messages_handler import WebSocketMessagesHandler
 
 
 @pytest.fixture(autouse=True)

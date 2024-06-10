@@ -3,8 +3,7 @@ from typing import NamedTuple
 
 from websockets.server import WebSocketServerProtocol
 
-from app.types import Event
-from app.types import UserId
+from app.types import Event, UserId
 
 
 @dataclass

@@ -1,4 +1,4 @@
-from typing import NewType, NamedTuple
+from typing import NamedTuple, NewType
 
 UserId = NewType("UserId", str)
 Event = NewType("Event", str)

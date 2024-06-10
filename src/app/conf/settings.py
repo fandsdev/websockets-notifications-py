@@ -2,8 +2,7 @@ from functools import lru_cache
 from typing import Literal
 
 from pydantic import AmqpDsn
-from pydantic_settings import BaseSettings
-from pydantic_settings import SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -33,4 +32,4 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_app_settings() -> Settings:
-    return Settings()  # type: ignore
+    return Settings()  # type: ignore[call-arg]

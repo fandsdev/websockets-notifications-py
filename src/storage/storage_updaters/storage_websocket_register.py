@@ -1,26 +1,23 @@
+import logging
 from dataclasses import dataclass
 from functools import cached_property
-import logging
 
 from websockets.server import WebSocketServerProtocol
 
 from app.services import BaseService
-from app.types import DecodedValidToken
-from app.types import UserId
+from app.types import DecodedValidToken, UserId
 from storage.exceptions import StorageOperationException
 from storage.subscription_storage import SubscriptionStorage
-from storage.types import ConnectedUserMeta
-from storage.types import WebSocketMeta
+from storage.types import ConnectedUserMeta, WebSocketMeta
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class StorageWebSocketRegister(BaseService):
-    """Add or update websocket in storage
+    """Add or update websocket in storage.
 
     If websocket not registered: just register it.
-
     If websocket is registered already:
         - if token's 'user_id' is the same then update websocket's expiration timestamp
         - if token's 'user_id' is different then do not change existed registered websocket and raise `StorageOperationException`
@@ -47,7 +44,7 @@ class StorageWebSocketRegister(BaseService):
 
         if self.existed_websocket_meta:
             self.update_registered_websocket_meta(self.existed_websocket_meta)
-            return None
+            return
 
         self.register_new_websocket()
 

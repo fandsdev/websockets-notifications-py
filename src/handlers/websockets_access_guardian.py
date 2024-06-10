@@ -1,6 +1,6 @@
 import asyncio
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 
 import websockets
 
@@ -36,9 +36,6 @@ class WebSocketsAccessGuardian:
 
             self.broadcast_authentication_expired(expired_websockets)
             self.remove_expired_websockets(expired_websockets)
-
-        e = self.storage.get_expired_websockets()
-        assert e is not None
 
     def broadcast_authentication_expired(self, expired_websockets: list[websockets.WebSocketServerProtocol]) -> None:
         error_message = ErrorResponseMessage(errors=["Token expired, user subscriptions disabled or removed"], incoming_message=None)

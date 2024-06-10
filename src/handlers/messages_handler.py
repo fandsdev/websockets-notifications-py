@@ -1,22 +1,16 @@
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-from typing import Coroutine, Any, Callable
+from typing import Any
 
 from websockets import WebSocketServerProtocol
 
-from a12n.jwk_client import AsyncJWKClient
-from a12n.jwk_client import AsyncJWKClientException
+from a12n.jwk_client import AsyncJWKClient, AsyncJWKClientException
 from app import conf
-from handlers.dto import AuthMessage
-from handlers.dto import SubscribeMessage
-from handlers.dto import UnsubscribeMessage
-from handlers.dto import SuccessResponseMessage
+from handlers.dto import AuthMessage, IncomingMessage, SubscribeMessage, SuccessResponseMessage, UnsubscribeMessage
 from handlers.exceptions import WebsocketMessageException
-from storage.exceptions import StorageOperationException
-from storage.storage_updaters import StorageWebSocketRegister
 from storage import SubscriptionStorage
-from storage.storage_updaters import StorageUserSubscriber
-from storage.storage_updaters import StorageUserUnsubscriber
-from handlers.dto import IncomingMessage
+from storage.exceptions import StorageOperationException
+from storage.storage_updaters import StorageUserSubscriber, StorageUserUnsubscriber, StorageWebSocketRegister
 
 AsyncMessageHandler = Callable[[WebSocketServerProtocol, Any], Coroutine[Any, Any, SuccessResponseMessage]]
 
@@ -43,7 +37,7 @@ class WebSocketMessagesHandler:
             validated_token = await self.jwk_client.decode(message.params.token.get_secret_value())
             StorageWebSocketRegister(storage=self.storage, websocket=websocket, validated_token=validated_token)()
         except (AsyncJWKClientException, StorageOperationException) as exc:
-            raise WebsocketMessageException(str(exc), message)
+            raise WebsocketMessageException(str(exc), message) from exc
 
         return SuccessResponseMessage.model_construct(incoming_message=message)
 
