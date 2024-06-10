@@ -3,8 +3,7 @@ import pytest
 from storage.exceptions import StorageOperationException
 from storage.storage_updaters import StorageWebSocketRegister
 from storage.subscription_storage import SubscriptionStorage
-from storage.types import ConnectedUserMeta
-from storage.types import WebSocketMeta
+from storage.types import ConnectedUserMeta, WebSocketMeta
 
 
 @pytest.fixture

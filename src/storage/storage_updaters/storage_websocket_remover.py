@@ -1,9 +1,9 @@
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
+from functools import cached_property
 from typing import cast
 
 from websockets.server import WebSocketServerProtocol
-from functools import cached_property
 
 from app.services import BaseService
 from app.types import UserId
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class StorageWebSocketRemover(BaseService):
-    """ "Remove connection from storage.
+    """Remove connection from storage.
 
     If websocket is not registered then nothing to do.
     If websocket is registered and it's last connection then unsubscribe user from all subscriptions.
@@ -31,7 +31,7 @@ class StorageWebSocketRemover(BaseService):
 
     def act(self) -> None:
         if not self.storage.is_websocket_registered(self.websocket):
-            return None
+            return
 
         if self.is_last_user_websocket():
             self.remove_user_subscriptions()

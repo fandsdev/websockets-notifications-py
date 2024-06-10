@@ -1,6 +1,6 @@
 import pytest
 
-from app.conf import get_app_settings
+from app.conf import Settings, get_app_settings
 
 pytest_plugins = [
     "app.fixtures",
@@ -9,5 +9,5 @@ pytest_plugins = [
 
 
 @pytest.fixture
-def settings():
+def settings() -> Settings:
     return get_app_settings()

@@ -1,12 +1,11 @@
+import logging
 from dataclasses import dataclass
 from functools import cached_property
-import logging
 
 from websockets.server import WebSocketServerProtocol
 
 from app.services import BaseService
-from app.types import UserId
-from app.types import Event
+from app.types import Event, UserId
 from storage.exceptions import StorageOperationException
 from storage.subscription_storage import SubscriptionStorage
 

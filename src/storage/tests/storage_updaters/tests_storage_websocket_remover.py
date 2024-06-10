@@ -1,5 +1,5 @@
-from contextlib import nullcontext as does_not_raise
 import pytest
+from contextlib import nullcontext as does_not_raise
 
 from storage.storage_updaters import StorageWebSocketRemover
 

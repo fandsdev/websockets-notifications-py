@@ -1,9 +1,9 @@
 import pytest
 
 from app.types import DecodedValidToken
-from storage.storage_updaters.storage_websocket_register import StorageWebSocketRegister
-from storage.storage_updaters.storage_user_subscriber import StorageUserSubscriber
 from storage import SubscriptionStorage
+from storage.storage_updaters.storage_user_subscriber import StorageUserSubscriber
+from storage.storage_updaters.storage_websocket_register import StorageWebSocketRegister
 
 
 @pytest.fixture

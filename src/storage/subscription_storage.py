@@ -1,13 +1,10 @@
-from dataclasses import dataclass
-from dataclasses import field
 import time
+from dataclasses import dataclass, field
 
 from websockets import WebSocketServerProtocol
 
-from app.types import Event
-from app.types import UserId
-from storage.types import ConnectedUserMeta
-from storage.types import WebSocketMeta
+from app.types import Event, UserId
+from storage.types import ConnectedUserMeta, WebSocketMeta
 
 
 @dataclass
