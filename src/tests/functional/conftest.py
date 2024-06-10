@@ -4,10 +4,9 @@ import pytest
 
 from websockets import client
 
-from entrypoint import app_runner
-from handlers import WebSocketsHandler
-from handlers import WebSocketsAccessGuardian
 from consumer import Consumer
+from entrypoint import app_runner
+from handlers import WebSocketsAccessGuardian, WebSocketsHandler
 
 
 @pytest.fixture
@@ -18,7 +17,7 @@ def force_token_validation(mocker, valid_token):
 @pytest.fixture(autouse=True)
 def _adjust_settings(settings, unused_tcp_port):
     settings.BROKER_QUEUE = None  # force consumer to create a queue with a random name
-    settings.WEBSOCKETS_HOST = "0.0.0.0"
+    settings.WEBSOCKETS_HOST = "0.0.0.0"  # noqa: S104
     settings.WEBSOCKETS_PORT = unused_tcp_port
 
 

@@ -1,10 +1,11 @@
-from abc import ABC
-from abc import abstractmethod
-from typing import Any, Callable
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from typing import Any
 
 
 class BaseService(ABC):
-    """This is a template of a a base service.
+    """Template of a a base service.
+
     All services in the app should follow this rules:
       * Input variables should be done at the __init__ phase
       * Service should implement a single entrypoint without arguments

@@ -1,5 +1,4 @@
-from app.conf.settings import get_app_settings
-from app.conf.settings import Settings
+from app.conf.settings import Settings, get_app_settings
 
 __all__ = [
     "Settings",

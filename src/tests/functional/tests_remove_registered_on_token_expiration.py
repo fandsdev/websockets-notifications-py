@@ -9,7 +9,7 @@ pytestmark = [
 @pytest.fixture
 def set_storage_connections_expired(storage):
     def set_expired():
-        for _, websocket_meta in storage.registered_websockets.items():
+        for websocket_meta in storage.registered_websockets.values():
             websocket_meta.expiration_timestamp = 1000  # far in the past
 
     return set_expired
