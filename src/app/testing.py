@@ -47,14 +47,14 @@ class MockedWebSocketServerProtocol(websockets.WebSocketServerProtocol):
         self.recv_queue.put_nowait(json.dumps(message))
 
     async def client_recv(self, skip_count_first_messages: int = 0) -> dict | None:
-            """Skip 'skip_count_first_messages' messages and return the next one. Convenient for testing."""
-            await self.wait_messages_to_be_sent()
+        """Skip 'skip_count_first_messages' messages and return the next one. Convenient for testing."""
+        await self.wait_messages_to_be_sent()
 
-            if self.send_queue.empty():
-                return None
+        if self.send_queue.empty():
+            return None
 
-            while skip_count_first_messages:
-                self.send_queue.get_nowait()
-                skip_count_first_messages -= 1
+        while skip_count_first_messages:
+            self.send_queue.get_nowait()
+            skip_count_first_messages -= 1
 
-            return json.loads(self.send_queue.get_nowait())
+        return json.loads(self.send_queue.get_nowait())

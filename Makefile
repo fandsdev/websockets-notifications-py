@@ -16,7 +16,7 @@ dev-deps: deps
 
 fmt:
 	ruff format $(SOURCES)
-	ruff check $(SOURCES) --fix --unsafe-fixes
+	ruff check --select I --fix $(SOURCES)
 
 lint:
 	dotenv-linter env.example

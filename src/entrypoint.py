@@ -26,13 +26,16 @@ async def app_runner(
     consumer: Consumer,
     stop_signal: asyncio.Future,
 ) -> None:
-    async with websockets.serve(
-        ws_handler=websockets_handler.websockets_handler,
-        host=settings.WEBSOCKETS_HOST,
-        port=settings.WEBSOCKETS_PORT,
-    ), asyncio.TaskGroup() as task_group:
-            task_group.create_task(access_guardian.run(stop_signal))
-            task_group.create_task(consumer.consume(stop_signal))
+    async with (
+        websockets.serve(
+            ws_handler=websockets_handler.websockets_handler,
+            host=settings.WEBSOCKETS_HOST,
+            port=settings.WEBSOCKETS_PORT,
+        ),
+        asyncio.TaskGroup() as task_group,
+    ):
+        task_group.create_task(access_guardian.run(stop_signal))
+        task_group.create_task(consumer.consume(stop_signal))
 
 
 async def main() -> None:
