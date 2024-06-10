@@ -1,5 +1,4 @@
-from handlers.dto import IncomingMessage
-from handlers.dto import ErrorResponseMessage
+from handlers.dto import ErrorResponseMessage, IncomingMessage
 
 
 class WebsocketMessageException(Exception):

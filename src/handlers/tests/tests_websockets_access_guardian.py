@@ -1,12 +1,11 @@
 import asyncio
-from datetime import datetime
 import json
 import pytest
+from datetime import datetime
 
 from app.types import DecodedValidToken
 from handlers.websockets_access_guardian import WebSocketsAccessGuardian
-from storage.storage_updaters import StorageWebSocketRegister
-from storage.storage_updaters import StorageUserSubscriber
+from storage.storage_updaters import StorageUserSubscriber, StorageWebSocketRegister
 
 pytestmark = [
     pytest.mark.slow,
@@ -30,8 +29,6 @@ def guardian(storage):
 
 @pytest.fixture(autouse=True)
 async def guardian_as_task(guardian):
-    # event_loop = asyncio.get_event_loop()
-
     stop_signal = asyncio.get_event_loop().create_future()
     runner_task = asyncio.create_task(guardian.run(stop_signal))
 
