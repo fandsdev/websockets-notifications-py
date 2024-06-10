@@ -73,6 +73,7 @@ ban-relative-imports = "all"
     "S101", # Use of `assert` detected
     "ARG001",  # Unused function argument
     "PLR2004",  # Magic value used in comparison, consider replacing `%value%` with a constant variable
+    "PLR0913",  # Too many arguments in function definition
 ]
 "**/fixtures.py" = [
     "ANN", # flake8-annotations

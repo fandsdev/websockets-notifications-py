@@ -1,9 +1,9 @@
 import pytest
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
 
 from consumer.consumer import Consumer
-from dataclasses import dataclass
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 
 @pytest.fixture(autouse=True)

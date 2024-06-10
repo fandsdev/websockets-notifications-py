@@ -1,17 +1,15 @@
 import asyncio
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import Protocol
 
 import aio_pika
+import websockets
+from pydantic import ValidationError
 
 from app import conf
-from consumer.dto import ConsumedMessage
-from consumer.dto import OutgoingMessage
+from consumer.dto import ConsumedMessage, OutgoingMessage
 from storage.subscription_storage import SubscriptionStorage
-from pydantic import ValidationError
-import websockets
-
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +59,7 @@ class Consumer:
         try:
             return ConsumedMessage.model_validate_json(raw_message.body)
         except ValidationError as exc:
-            logger.error("Consumed message not in expected format. Errors: %s", exc.errors())
+            logger.error("Consumed message not in expected format. Errors: %s", exc.errors())  # noqa: TRY400
             return None
 
     @staticmethod
