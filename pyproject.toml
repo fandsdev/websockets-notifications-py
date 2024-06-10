@@ -59,6 +59,7 @@ ignore = [
     "COM812",  # Trailing comma missing
     "EM101",  # exception must not use a string literal, assign to variable first
     "EM102",  # expection must not use an f-string literal, assign to variable first
+    "N818",  # exception name `{}` should be named with an Error suffix
 ]
 
 

@@ -1,7 +1,6 @@
 import pytest
 
-from respx import MockRouter
-from respx import Route
+from respx import MockRouter, Route
 
 from a12n.jwk_client import AsyncJWKClient
 
@@ -10,13 +9,13 @@ JWKS_URL = "https://auth.test.com/auth/realms/test-realm/protocol/openid-connect
 
 @pytest.fixture
 def expired_token():
-    return "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNMcjhuTjh1R29wUElMZlFvUGpfRCJ9.eyJpc3MiOiJodHRwczovL2Rldi1wcm50ZG1vMTYzc2NsczR4LnVzLmF1dGgwLmNvbS8iLCJhdWQiOiIxV1NiR1hGUnlhS0NsTHJvWHZteTlXdndrZUtHb1JvayIsImlhdCI6MTY5ODUyODU1OSwiZXhwIjoxNjk4NTI4ODU5LCJzdWIiOiJhdXRoMHw2NTNjMzI2MGEzMDQ0OGM1OTRhNjllMTIiLCJzaWQiOiI5MEZ3WFNDSFUtd0N3QmY0Y1YyQ3NZTnpBMldieDNUcSIsIm5vbmNlIjoiZTIxZWVhNTljNGY1MDg0N2Q3YzFhOGUzZjQ0NjVjYTcifQ.FO_xoMA9RGI7uAVauv00-zdORgkvCwyWfeAPd7lmU_nKzGp5avPa2MN66S0fjLKOxb8tgzrfpXYLUhDl1nqUvtj1A54-PfNW0n0ctdn2zk_CCOxsAjKyImlIgq7Y4DIuil0wikj7FdoWkB-bCBrKs7JaOoWkSHws9uQxRyvZzBwPHExW0myHWvB3G0x8g23PfSv2oALbvXBp0OAniGwru2Br9e2iXCVyGAUMTCpQmjPDAyfeYXGxF9BhxuX3e-GL80oyngBQK0kTxw-2Xz8LDSC-MI2jTs1gUo9qdVrg_1fzQtvAW9LGaWg5L_CJe92ZH3l1fBPfSh7Gc6uBtwF-YA"
+    return "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNMcjhuTjh1R29wUElMZlFvUGpfRCJ9.eyJpc3MiOiJodHRwczovL2Rldi1wcm50ZG1vMTYzc2NsczR4LnVzLmF1dGgwLmNvbS8iLCJhdWQiOiIxV1NiR1hGUnlhS0NsTHJvWHZteTlXdndrZUtHb1JvayIsImlhdCI6MTY5ODUyODU1OSwiZXhwIjoxNjk4NTI4ODU5LCJzdWIiOiJhdXRoMHw2NTNjMzI2MGEzMDQ0OGM1OTRhNjllMTIiLCJzaWQiOiI5MEZ3WFNDSFUtd0N3QmY0Y1YyQ3NZTnpBMldieDNUcSIsIm5vbmNlIjoiZTIxZWVhNTljNGY1MDg0N2Q3YzFhOGUzZjQ0NjVjYTcifQ.FO_xoMA9RGI7uAVauv00-zdORgkvCwyWfeAPd7lmU_nKzGp5avPa2MN66S0fjLKOxb8tgzrfpXYLUhDl1nqUvtj1A54-PfNW0n0ctdn2zk_CCOxsAjKyImlIgq7Y4DIuil0wikj7FdoWkB-bCBrKs7JaOoWkSHws9uQxRyvZzBwPHExW0myHWvB3G0x8g23PfSv2oALbvXBp0OAniGwru2Br9e2iXCVyGAUMTCpQmjPDAyfeYXGxF9BhxuX3e-GL80oyngBQK0kTxw-2Xz8LDSC-MI2jTs1gUo9qdVrg_1fzQtvAW9LGaWg5L_CJe92ZH3l1fBPfSh7Gc6uBtwF-YA"  # noqa: E501
 
 
 @pytest.fixture
 def token():
     # The token won't expire in ~100 years (expiration date 2123-10-05, it's more than enough to rely on it in test)
-    return "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNMcjhuTjh1R29wUElMZlFvUGpfRCJ9.eyJpc3MiOiJodHRwczovL2Rldi1wcm50ZG1vMTYzc2NsczR4LnVzLmF1dGgwLmNvbS8iLCJhdWQiOiIxV1NiR1hGUnlhS0NsTHJvWHZteTlXdndrZUtHb1JvayIsImlhdCI6MTY5ODUyODE3MCwiZXhwIjo0ODUyMTI4MTcwLCJzdWIiOiJhdXRoMHw2NTNjMzI2MGEzMDQ0OGM1OTRhNjllMTIiLCJzaWQiOiI5MEZ3WFNDSFUtd0N3QmY0Y1YyQ3NZTnpBMldieDNUcSIsIm5vbmNlIjoiMTVhNWI2M2Y3MzI5MDcwMmU3MGViZmJlMDc5ODgxYmIifQ.FQYBaTnjKJHcskRl1WsB4kKQmyvXRcG8RDWlB2woSbzukZx7SnWghC1qRhYeqOLBUBpe3Iu_EzxgF26YDZJ28bKKNgL4fVmYak3jOg2nRP2lulrkF8USmkqT9Vx85hlIEVCisYOS6DJE0bHJL5WbHjCmDjQ6RGRyVZ3s6UPFXIwe2CMC_egAdWrsLYrgA1mqozQhwLJN2zSuObkDffkpHbX9XXB225v3-ryY-Rr0rPh9AOfKtEeMUEmNG0gsGyIbi0DoPDjAxlxCDx7ULVSChIKhUv4DKICqrqzHyopA7oE8LlpDbPTshQsL6L4u1EwUT7maP9VTcEQUTnp3Cu5msw"
+    return "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjNMcjhuTjh1R29wUElMZlFvUGpfRCJ9.eyJpc3MiOiJodHRwczovL2Rldi1wcm50ZG1vMTYzc2NsczR4LnVzLmF1dGgwLmNvbS8iLCJhdWQiOiIxV1NiR1hGUnlhS0NsTHJvWHZteTlXdndrZUtHb1JvayIsImlhdCI6MTY5ODUyODE3MCwiZXhwIjo0ODUyMTI4MTcwLCJzdWIiOiJhdXRoMHw2NTNjMzI2MGEzMDQ0OGM1OTRhNjllMTIiLCJzaWQiOiI5MEZ3WFNDSFUtd0N3QmY0Y1YyQ3NZTnpBMldieDNUcSIsIm5vbmNlIjoiMTVhNWI2M2Y3MzI5MDcwMmU3MGViZmJlMDc5ODgxYmIifQ.FQYBaTnjKJHcskRl1WsB4kKQmyvXRcG8RDWlB2woSbzukZx7SnWghC1qRhYeqOLBUBpe3Iu_EzxgF26YDZJ28bKKNgL4fVmYak3jOg2nRP2lulrkF8USmkqT9Vx85hlIEVCisYOS6DJE0bHJL5WbHjCmDjQ6RGRyVZ3s6UPFXIwe2CMC_egAdWrsLYrgA1mqozQhwLJN2zSuObkDffkpHbX9XXB225v3-ryY-Rr0rPh9AOfKtEeMUEmNG0gsGyIbi0DoPDjAxlxCDx7ULVSChIKhUv4DKICqrqzHyopA7oE8LlpDbPTshQsL6L4u1EwUT7maP9VTcEQUTnp3Cu5msw"  # noqa: E501
 
 
 @pytest.fixture
@@ -26,7 +25,7 @@ def matching_kid_data():
             {
                 "kty": "RSA",
                 "use": "sig",
-                "n": "oIQkRCY4X-_ItMUPt65wVIGewOJfjMhlu6HG_rHik5-dTK0o6oyUne2Gevetn2Vrn8NSIaARobLZ8expuJBYDS121w_RloC6MCuzlc-j_nHj-BcBOCqGWPVwKX4un0HueD3aW3buqzYcmX_9LhdSE8ARyN0S9O6RbYWDCTKFhrRXtIP4wzP8vdPGXGurtGIiBbhVCK1LHG2lO5Gt8IIQ_DAcX6swnXCfbHwR1OXc9Do06o8c7ZsZdjMty5b4Fpv8rAKA-HTP_One4yhKtqCMYs3_gcTeQdHi-0w634VnpdzC_0f_MMzNIgvXC8VdJgkGpa6jLBp3mTqaFUdkAXFYlw",
+                "n": "oIQkRCY4X-_ItMUPt65wVIGewOJfjMhlu6HG_rHik5-dTK0o6oyUne2Gevetn2Vrn8NSIaARobLZ8expuJBYDS121w_RloC6MCuzlc-j_nHj-BcBOCqGWPVwKX4un0HueD3aW3buqzYcmX_9LhdSE8ARyN0S9O6RbYWDCTKFhrRXtIP4wzP8vdPGXGurtGIiBbhVCK1LHG2lO5Gt8IIQ_DAcX6swnXCfbHwR1OXc9Do06o8c7ZsZdjMty5b4Fpv8rAKA-HTP_One4yhKtqCMYs3_gcTeQdHi-0w634VnpdzC_0f_MMzNIgvXC8VdJgkGpa6jLBp3mTqaFUdkAXFYlw",  # noqa: E501
                 "e": "AQAB",
                 "kid": "3Lr8nN8uGopPILfQoPj_D",
                 "x5t": "f93zLhSTsgVJiS9JA0x8sHkaLMg",
@@ -46,7 +45,7 @@ def not_matching_kid_data():
             {
                 "kty": "RSA",
                 "use": "sig",
-                "n": "zB0xsH539lpLVejR6Hq1bHN3EzDt_0tJyr5JVHz3GSnNYAaZzkqL7HyLlhwttl7_bRyZJeZ8X6aasBxVK2JCDc9U-0KMJXmSoJs1oWYRo79DqdzCXK3ZYXcgkvI9OWF1qVx76vbZVwiRv5qUzpINdLnsX2CXChyd0LFkg14bYrSfdN-eMmG1PXtHZufeKG6HW17PFXS7OwesMQIfQ9kFfSvgFkJgkNM0o6NaeB-ZPDvzfKmmpBXjtGcze0A56NdQ7Z42DRDURROS82sPISrX-iAt93tZ1F0IW_U4niIYc6NFcWPPXpQpiVDDwdrz-L1H63mSUDSDFsWVcv2xWry6kQ",
+                "n": "zB0xsH539lpLVejR6Hq1bHN3EzDt_0tJyr5JVHz3GSnNYAaZzkqL7HyLlhwttl7_bRyZJeZ8X6aasBxVK2JCDc9U-0KMJXmSoJs1oWYRo79DqdzCXK3ZYXcgkvI9OWF1qVx76vbZVwiRv5qUzpINdLnsX2CXChyd0LFkg14bYrSfdN-eMmG1PXtHZufeKG6HW17PFXS7OwesMQIfQ9kFfSvgFkJgkNM0o6NaeB-ZPDvzfKmmpBXjtGcze0A56NdQ7Z42DRDURROS82sPISrX-iAt93tZ1F0IW_U4niIYc6NFcWPPXpQpiVDDwdrz-L1H63mSUDSDFsWVcv2xWry6kQ",  # noqa: E501
                 "e": "AQAB",
                 "kid": "ICOpsXGmpNaDPiljjRjiE",
                 "x5t": "1GDK6kGV6HvZ1m_-VdSKIFNEtEU",

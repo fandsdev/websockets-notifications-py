@@ -1,19 +1,16 @@
 import asyncio
-from dataclasses import dataclass
 import json
 import logging
+from dataclasses import dataclass
 
 import httpx
 import jwt
-from jwt.api_jwk import PyJWK
-from jwt.api_jwk import PyJWKSet
+from jwt.api_jwk import PyJWK, PyJWKSet
 from jwt.api_jwt import decode_complete as decode_token
 from jwt.exceptions import PyJWKSetError
 from jwt.jwk_set_cache import JWKSetCache
 
-
 from app.types import DecodedValidToken
-
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +21,8 @@ class AsyncJWKClientException(Exception):
 
 @dataclass
 class AsyncJWKClient:
-    """
+    """Async JW Keys client.
+
     Inspired and partially copy-pasted from 'jwt.jwks_client.PyJWKClient'.
     The purpose is the same but querying the JWKS endpoint is async.
     """
@@ -68,7 +66,7 @@ class AsyncJWKClient:
         except PyJWKSetError as exc:
             raise AsyncJWKClientException(exc) from exc
 
-    async def get_jwk_set(self, refresh: bool = False) -> PyJWKSet:
+    async def get_jwk_set(self, *, refresh: bool = False) -> PyJWKSet:
         jwk_set: PyJWKSet | None = None
 
         while self.fetch_data_lock.locked():
@@ -82,8 +80,8 @@ class AsyncJWKClient:
 
         return jwk_set
 
-    async def get_signing_keys(self, refresh: bool = False) -> list[PyJWK]:
-        jwk_set = await self.get_jwk_set(refresh)
+    async def get_signing_keys(self, *, refresh: bool = False) -> list[PyJWK]:
+        jwk_set = await self.get_jwk_set(refresh=refresh)
 
         signing_keys = [
             jwk_set_key
@@ -102,7 +100,7 @@ class AsyncJWKClient:
         return signing_keys
 
     async def get_signing_key(self, kid: str) -> PyJWK:
-        signing_keys = await self.get_signing_keys()
+        signing_keys = await self.get_signing_keys(refresh=False)
         signing_key = self.match_kid(signing_keys, kid)
 
         if not signing_key:
