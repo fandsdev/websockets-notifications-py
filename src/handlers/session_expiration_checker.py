@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class WebSocketsAccessGuardian:
+class SessionExpirationChecker:
     storage: SubscriptionStorage
     check_interval: float = 60.0  # in seconds
 

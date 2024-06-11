@@ -6,7 +6,7 @@ from websockets import client
 
 from consumer import Consumer
 from entrypoint import app_runner
-from handlers import WebSocketsAccessGuardian, WebSocketsHandler
+from handlers import SessionExpirationChecker, WebSocketsHandler
 
 
 @pytest.fixture(autouse=True)
@@ -29,8 +29,8 @@ async def stop_signal():
 
 
 @pytest.fixture
-def access_guardian(storage):
-    return WebSocketsAccessGuardian(storage=storage, check_interval=0.5)
+def session_expiration_checker(storage):
+    return SessionExpirationChecker(storage=storage, check_interval=0.5)
 
 
 @pytest.fixture
@@ -39,12 +39,12 @@ def consumer(storage):
 
 
 @pytest.fixture(autouse=True)
-async def serve_app_runner(settings, websockets_handler, access_guardian, consumer, stop_signal):
+async def serve_app_runner(settings, websockets_handler, session_expiration_checker, consumer, stop_signal):
     serve_task = asyncio.create_task(
         app_runner(
             settings=settings,
             websockets_handler=websockets_handler,
-            access_guardian=access_guardian,
+            session_expiration_checker=session_expiration_checker,
             consumer=consumer,
             stop_signal=stop_signal,
         ),
