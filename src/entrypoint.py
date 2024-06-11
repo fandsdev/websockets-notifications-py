@@ -6,7 +6,7 @@ import websockets
 
 from app import conf
 from consumer import Consumer
-from handlers import WebSocketsAccessGuardian, WebSocketsHandler
+from handlers import SessionExpirationChecker, WebSocketsHandler
 from storage.subscription_storage import SubscriptionStorage
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +22,7 @@ def create_stop_signal() -> asyncio.Future[None]:
 async def app_runner(
     settings: conf.Settings,
     websockets_handler: WebSocketsHandler,
-    access_guardian: WebSocketsAccessGuardian,
+    session_expiration_checker: SessionExpirationChecker,
     consumer: Consumer,
     stop_signal: asyncio.Future,
 ) -> None:
@@ -34,7 +34,7 @@ async def app_runner(
         ),
         asyncio.TaskGroup() as task_group,
     ):
-        task_group.create_task(access_guardian.run(stop_signal))
+        task_group.create_task(session_expiration_checker.run(stop_signal))
         task_group.create_task(consumer.consume(stop_signal))
 
 
@@ -44,13 +44,13 @@ async def main() -> None:
 
     storage = SubscriptionStorage()
     websockets_handler = WebSocketsHandler(storage=storage)
-    access_guardian = WebSocketsAccessGuardian(storage=storage, check_interval=60.0)
+    session_expiration_checker = SessionExpirationChecker(storage=storage, check_interval=60.0)
     consumer = Consumer(storage=storage)
 
     await app_runner(
         settings=settings,
         websockets_handler=websockets_handler,
-        access_guardian=access_guardian,
+        session_expiration_checker=session_expiration_checker,
         consumer=consumer,
         stop_signal=stop_signal,
     )

@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime
 
 from app.types import DecodedValidToken
-from handlers.websockets_access_guardian import WebSocketsAccessGuardian
+from handlers.session_expiration_checker import SessionExpirationChecker
 from storage.storage_updaters import StorageUserSubscriber, StorageWebSocketRegister
 
 pytestmark = [
@@ -18,19 +18,19 @@ def mock_broadcast(mocker):
 
 
 @pytest.fixture
-def get_guardian_enough_time_to_do_its_job():
+def give_expiration_checker_enough_time():
     return lambda: asyncio.sleep(0.4)
 
 
 @pytest.fixture
-def guardian(storage):
-    return WebSocketsAccessGuardian(storage=storage, check_interval=0.1)
+def expiration_checker(storage):
+    return SessionExpirationChecker(storage=storage, check_interval=0.1)
 
 
 @pytest.fixture(autouse=True)
-async def guardian_as_task(guardian):
+async def expiration_checker_as_task(expiration_checker):
     stop_signal = asyncio.get_event_loop().create_future()
-    runner_task = asyncio.create_task(guardian.run(stop_signal))
+    runner_task = asyncio.create_task(expiration_checker.run(stop_signal))
 
     yield runner_task
 
@@ -49,15 +49,15 @@ def ws_subscribed(ws, storage, event):
     return ws
 
 
-def test_guardian_monitor_and_manage_access_remove_expired_websockets(guardian, storage, ws_subscribed):
-    guardian.monitor_and_manage_access()
+def test_expiration_checker_monitor_and_manage_access_remove_expired_websockets(expiration_checker, storage, ws_subscribed):
+    expiration_checker.monitor_and_manage_access()
 
     registered_websockets = storage.get_registered_websockets()
     assert registered_websockets == []
 
 
-async def test_remove_expired_websockets_from_storage(get_guardian_enough_time_to_do_its_job, storage, mock_broadcast, ws_subscribed, mocker):
-    await get_guardian_enough_time_to_do_its_job()
+async def test_remove_expired_websockets_from_storage(give_expiration_checker_enough_time, storage, mock_broadcast, ws_subscribed, mocker):
+    await give_expiration_checker_enough_time()
 
     registered_websockets = storage.get_registered_websockets()
     assert registered_websockets == []
@@ -65,8 +65,8 @@ async def test_remove_expired_websockets_from_storage(get_guardian_enough_time_t
     mock_broadcast.assert_called_once_with(websockets=[ws_subscribed], message=mocker.ANY)
 
 
-async def test_broadcasted_message(get_guardian_enough_time_to_do_its_job, mock_broadcast):
-    await get_guardian_enough_time_to_do_its_job()
+async def test_expiration_checker_broadcasted_message(give_expiration_checker_enough_time, mock_broadcast):
+    await give_expiration_checker_enough_time()
 
     broadcasted_message_as_json = json.loads(mock_broadcast.call_args.kwargs["message"])
     assert len(broadcasted_message_as_json) == 2
@@ -75,8 +75,8 @@ async def test_broadcasted_message(get_guardian_enough_time_to_do_its_job, mock_
 
 
 @pytest.mark.freeze_time("2023-01-01 12:22:55Z", tick=True)  # 5 seconds before expiration
-async def test_do_not_remove_not_expired_connections(get_guardian_enough_time_to_do_its_job, storage, ws_subscribed, mock_broadcast):
-    await get_guardian_enough_time_to_do_its_job()
+async def test_expiration_checker_not_remove_active_connections(give_expiration_checker_enough_time, storage, ws_subscribed, mock_broadcast):
+    await give_expiration_checker_enough_time()
 
     registered_websockets = storage.get_registered_websockets()
     assert registered_websockets == [ws_subscribed]
