@@ -9,16 +9,13 @@ from entrypoint import app_runner
 from handlers import WebSocketsAccessGuardian, WebSocketsHandler
 
 
-@pytest.fixture
-def force_token_validation(mocker, valid_token):
-    return mocker.patch("a12n.jwk_client.AsyncJWKClient.decode", return_value=valid_token)
-
-
 @pytest.fixture(autouse=True)
-def _adjust_settings(settings, unused_tcp_port):
+def adjust_settings(settings, unused_tcp_port, jwt_public_key):
     settings.BROKER_QUEUE = None  # force consumer to create a queue with a random name
     settings.WEBSOCKETS_HOST = "0.0.0.0"  # noqa: S104
     settings.WEBSOCKETS_PORT = unused_tcp_port
+    settings.JWT_PUBLIC_KEY = jwt_public_key
+    return settings
 
 
 @pytest.fixture
@@ -98,12 +95,12 @@ def ws_client_send_and_recv():
 
 
 @pytest.fixture
-def auth_message_data():
+def auth_message_data(jwt_user_valid_token):
     return {
         "message_id": 777,
         "message_type": "Authenticate",
         "params": {
-            "token": "valid-token",
+            "token": jwt_user_valid_token,
         },
     }
 
@@ -114,5 +111,5 @@ def auth_message(auth_message_data):
 
 
 @pytest.fixture
-async def ws_client_authenticated(auth_message, ws_client_send_and_recv, ws_client, force_token_validation):
+async def ws_client_authenticated(auth_message, ws_client_send_and_recv, ws_client):
     return await ws_client_send_and_recv(ws_client, auth_message)

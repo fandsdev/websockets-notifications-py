@@ -1,18 +1,18 @@
-from collections.abc import Callable, Coroutine
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from jwt.exceptions import InvalidTokenError
 from websockets import WebSocketServerProtocol
 
-from a12n.jwk_client import AsyncJWKClient, AsyncJWKClientException
-from app import conf
+from a12n import jwt_decode
 from handlers.dto import AuthMessage, IncomingMessage, SubscribeMessage, SuccessResponseMessage, UnsubscribeMessage
 from handlers.exceptions import WebsocketMessageException
 from storage import SubscriptionStorage
 from storage.exceptions import StorageOperationException
 from storage.storage_updaters import StorageUserSubscriber, StorageUserUnsubscriber, StorageWebSocketRegister
 
-AsyncMessageHandler = Callable[[WebSocketServerProtocol, Any], Coroutine[Any, Any, SuccessResponseMessage]]
+MessageHandler = Callable[[WebSocketServerProtocol, Any], SuccessResponseMessage]
 
 
 @dataclass
@@ -20,31 +20,28 @@ class WebSocketMessagesHandler:
     storage: SubscriptionStorage
 
     def __post_init__(self) -> None:
-        settings = conf.get_app_settings()
-        self.jwk_client = AsyncJWKClient(jwks_url=settings.AUTH_JWKS_URL, supported_signing_algorithms=settings.AUTH_SUPPORTED_SIGNING_ALGORITHMS)
-
-        self.message_handlers: dict[str, AsyncMessageHandler] = {
+        self.message_handlers: dict[str, MessageHandler] = {
             "Authenticate": self.handle_auth_message,
             "Subscribe": self.handle_subscribe_message,
             "Unsubscribe": self.handle_unsubscribe_message,
         }
 
-    async def handle_message(self, websocket: WebSocketServerProtocol, message: IncomingMessage) -> SuccessResponseMessage:
-        return await self.message_handlers[message.message_type](websocket, message)
+    def handle_message(self, websocket: WebSocketServerProtocol, message: IncomingMessage) -> SuccessResponseMessage:
+        return self.message_handlers[message.message_type](websocket, message)
 
-    async def handle_auth_message(self, websocket: WebSocketServerProtocol, message: AuthMessage) -> SuccessResponseMessage:
+    def handle_auth_message(self, websocket: WebSocketServerProtocol, message: AuthMessage) -> SuccessResponseMessage:
         try:
-            validated_token = await self.jwk_client.decode(message.params.token.get_secret_value())
+            validated_token = jwt_decode.decode(jwt_token=message.params.token.get_secret_value())
             StorageWebSocketRegister(storage=self.storage, websocket=websocket, validated_token=validated_token)()
-        except (AsyncJWKClientException, StorageOperationException) as exc:
+        except (InvalidTokenError, StorageOperationException) as exc:
             raise WebsocketMessageException(str(exc), message) from exc
 
         return SuccessResponseMessage.model_construct(incoming_message=message)
 
-    async def handle_subscribe_message(self, websocket: WebSocketServerProtocol, message: SubscribeMessage) -> SuccessResponseMessage:
+    def handle_subscribe_message(self, websocket: WebSocketServerProtocol, message: SubscribeMessage) -> SuccessResponseMessage:
         StorageUserSubscriber(storage=self.storage, websocket=websocket, event=message.params.event)()
         return SuccessResponseMessage.model_construct(incoming_message=message)
 
-    async def handle_unsubscribe_message(self, websocket: WebSocketServerProtocol, message: UnsubscribeMessage) -> SuccessResponseMessage:
+    def handle_unsubscribe_message(self, websocket: WebSocketServerProtocol, message: UnsubscribeMessage) -> SuccessResponseMessage:
         StorageUserUnsubscriber(storage=self.storage, websocket=websocket, event=message.params.event)()
         return SuccessResponseMessage.model_construct(incoming_message=message)
