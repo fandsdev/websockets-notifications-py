@@ -2,7 +2,6 @@ import pytest
 
 pytestmark = [
     pytest.mark.rabbitmq,
-    pytest.mark.usefixtures("force_token_validation"),
 ]
 
 

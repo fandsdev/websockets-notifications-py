@@ -50,7 +50,7 @@ class WebSocketsHandler:
             return ErrorResponseMessage.model_construct(errors=exc.errors(include_url=False, include_context=False), incoming_message=None)
 
         try:
-            success_response = await self.messages_handler.handle_message(websocket, message)
+            success_response = self.messages_handler.handle_message(websocket, message)
         except WebsocketMessageException as exc:
             return exc.as_error_message()
 

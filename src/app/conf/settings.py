@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import AmqpDsn
+from pydantic import AliasChoices, AmqpDsn, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,8 +14,7 @@ class Settings(BaseSettings):
     WEBSOCKETS_PORT: int
     WEBSOCKETS_PATH: str
 
-    AUTH_JWKS_URL: str
-    AUTH_SUPPORTED_SIGNING_ALGORITHMS: list[str]
+    JWT_PUBLIC_KEY: str = Field(validation_alias=AliasChoices("jwt_public_key", "JWT_PUBLIC_KEY"))
 
     DEBUG: bool = False
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "WARNING"
@@ -27,6 +26,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        secrets_dir="../secrets",
     )
 
 
