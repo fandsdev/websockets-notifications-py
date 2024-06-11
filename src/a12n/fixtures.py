@@ -7,6 +7,7 @@ from app.types import UserId
 
 @pytest.fixture
 def jwt_private_key():
+    """For test purposes only. The running application should not access the private key."""
     return """-----BEGIN PRIVATE KEY-----
 MIIJQQIBADANBgkqhkiG9w0BAQEFAASCCSswggknAgEAAoICAQCp2c5sLjs1QCo4
 4K87M6DiLQrFlpN7abut9B71r6tZu2QnZM25qQ3t5GyG+/ZRUY/i5IoQp7fnq/gb

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     WEBSOCKETS_PORT: int
     WEBSOCKETS_PATH: str
 
-    JWT_PUBLIC_KEY: str = Field(validation_alias=AliasChoices("jwt_public_key", "JWT_PUBLIC_KEY"))
+    JWT_PUBLIC_KEY: str = Field(validation_alias=AliasChoices("jwt_public_key.pem", "JWT_PUBLIC_KEY"))
 
     DEBUG: bool = False
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "WARNING"
