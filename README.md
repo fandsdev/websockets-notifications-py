@@ -1,4 +1,10 @@
-### websockets-notifications Demo
+## websockets-notifications Demo
+
+A notification service via WebSockets. 
+Allows clients to connect, authenticate through a JWT token, and subscribe to events.
+Events are captured by a consumer and all subscribers are notified.
+
+[Documentation schemas](./docs/)
 
 This project requires Python 3.12+.
 Dependencies are managed by [uv](https://github.com/astral-sh/uv) and should be installed.
