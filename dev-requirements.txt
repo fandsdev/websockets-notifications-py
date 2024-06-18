@@ -141,7 +141,7 @@ typing-extensions==4.12.1
     #   mypy
     #   pydantic
     #   pydantic-core
-urllib3==2.2.1
+urllib3==2.2.2
     # via sentry-sdk
 wcwidth==0.2.13
     # via prompt-toolkit
