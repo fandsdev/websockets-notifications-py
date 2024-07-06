@@ -8,7 +8,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.4.0
     # via httpx
-certifi==2024.6.2
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
