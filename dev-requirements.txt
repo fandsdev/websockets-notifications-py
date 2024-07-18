@@ -119,7 +119,7 @@ respx==0.21.1
     # via websockets-notification-py (pyproject.toml)
 ruff==0.4.8
     # via websockets-notification-py (pyproject.toml)
-sentry-sdk==2.3.1
+sentry-sdk==2.8.0
     # via websockets-notification-py (pyproject.toml)
 six==1.16.0
     # via
