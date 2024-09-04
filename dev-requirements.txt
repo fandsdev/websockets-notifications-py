@@ -25,7 +25,7 @@ click==8.1.7
     #   dotenv-linter
 click-default-group==1.2.4
     # via dotenv-linter
-cryptography==42.0.7
+cryptography==43.0.1
     # via pyjwt
 decorator==5.1.1
     # via ipython
